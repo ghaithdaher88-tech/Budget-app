@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ميزانيتي">
+  <title>ميزانيتي الشهرية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Cairo',sans-serif;}
+    input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+    select option{color:#e2e8f0;}
+    @media print{.no-print{display:none!important}.print-area{background:white!important;color:black!important;padding:20px!important;}}
+    .theme-transition{transition:background 0.3s ease,color 0.3s ease;}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback } = React;
+
+// ============ TRANSLATIONS ============
+const T = {
+  ar: {
+    dir: "rtl", font: "'Cairo',sans-serif",
+    appName: "ميزانيتي الشهرية", salary: "الراتب", currentMonth: "الشهر الحالي", pastMonth: "شهر سابق",
+    dashboard: "لوحة التحكم", add: "إضافة", history: "السجل", report: "التقرير", settings: "الإعدادات",
+    fixed: "ثابت", spent: "منفق", remaining: "متبقي",
+    variableBudgets: "البنود المتغيرة", fixedExpenses: "المصاريف الثابتة", total: "الإجمالي",
+    addExpense: "إضافة مصروف", desc: "الوصف", amount: "المبلغ", category: "الفئة", date: "التاريخ",
+    saveExpense: "✅ حفظ المصروف", saving: "⏳ جاري الحفظ...", saved: "✅ تم الحفظ", autoSaved: "💾 البيانات محفوظة تلقائياً",
+    descPlaceholder: "مثال: سوبرماركت", amountPlaceholder: "0.00",
+    errorDesc: "أدخل وصف المصروف", errorAmount: "أدخل مبلغاً صحيحاً",
+    noExpenses: "لا توجد مصاريف لهذا الشهر", addFirst: "➕ أضف أول مصروف",
+    ops: "عملية", delete: "حذف",
+    reportTitle: "التقرير الشهري", refresh: "🔄 تحديث", print: "🖨️ PDF",
+    monthSummary: "ملخص الشهر", budgetDetails: "تفاصيل البنود", aiAnalysis: "التحليل الذكي",
+    createAnalysis: "🤖 إنشاء التحليل", analyzing: "⏳ جاري التحليل...",
+    budget: "الميزانية", status: "الحالة", withinBudget: "✅ ضمن", exceeded: "⚠️ تجاوز",
+    gmailReport: "تقرير أسبوعي على Gmail", gmailDesc: "إنشاء مسودة جاهزة في بريدك",
+    gmailSend: "📤 إرسال", gmailSending: "⏳...", gmailSuccess: "✅ تم!", gmailError: "❌ خطأ",
+    gmailDone: "✅ المسودة جاهزة في Gmail!", gmailFail: "⚠️ تعذر الإرسال، حاول مرة أخرى.",
+    settingsTitle: "الإعدادات", monthlySalary: "💵 الراتب الشهري", edit: "تعديل", cancel: "إلغاء", save: "حفظ",
+    fixedBudgets: "📌 المصاريف الثابتة", variableCategories: "📂 البنود المتغيرة",
+    addFixed: "➕ إضافة بند ثابت", addVariable: "➕ إضافة بند متغير",
+    namePlaceholder: "الاسم", budgetPlaceholder: "الميزانية", add2: "إضافة",
+    language: "🌐 اللغة", theme: "🎨 المظهر",
+    overBy: "تجاوز بـ", leftOf: "متبقي",
+    months: ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"],
+    reportPrompt: (month, income, fixedT, totalS, rem, rows, exps) =>
+      `أنت مستشار مالي. اكتب تقرير ميزانية شهري احترافي بالعربية لشهر ${month}. الراتب: ${income} | الثابت: ${fixedT} | المنفق: ${totalS} | المتبقي: ${rem}. البنود: ${rows}. المصاريف: ${exps}. اكتب: ١-ملخص ٢-أبرز الملاحظات ٣-البنود المتجاوزة ٤-نصائح للشهر القادم`,
+  },
+  en: {
+    dir: "ltr", font: "'Inter',sans-serif",
+    appName: "My Monthly Budget", salary: "Salary", currentMonth: "Current Month", pastMonth: "Past Month",
+    dashboard: "Dashboard", add: "Add", history: "History", report: "Report", settings: "Settings",
+    fixed: "Fixed", spent: "Spent", remaining: "Remaining",
+    variableBudgets: "Variable Budgets", fixedExpenses: "Fixed Expenses", total: "Total",
+    addExpense: "Add Expense", desc: "Description", amount: "Amount", category: "Category", date: "Date",
+    saveExpense: "✅ Save Expense", saving: "⏳ Saving...", saved: "✅ Saved", autoSaved: "💾 Auto-saved",
+    descPlaceholder: "e.g. Supermarket", amountPlaceholder: "0.00",
+    errorDesc: "Enter a description", errorAmount: "Enter a valid amount",
+    noExpenses: "No expenses this month", addFirst: "➕ Add first expense",
+    ops: "transactions", delete: "Delete",
+    reportTitle: "Monthly Report", refresh: "🔄 Refresh", print: "🖨️ PDF",
+    monthSummary: "Month Summary", budgetDetails: "Budget Details", aiAnalysis: "AI Analysis",
+    createAnalysis: "🤖 Generate Analysis", analyzing: "⏳ Analyzing...",
+    budget: "Budget", status: "Status", withinBudget: "✅ Within", exceeded: "⚠️ Exceeded",
+    gmailReport: "Weekly Gmail Report", gmailDesc: "Create a ready draft in your inbox",
+    gmailSend: "📤 Send", gmailSending: "⏳...", gmailSuccess: "✅ Done!", gmailError: "❌ Error",
+    gmailDone: "✅ Draft ready in Gmail!", gmailFail: "⚠️ Failed, try again.",
+    settingsTitle: "Settings", monthlySalary: "💵 Monthly Salary", edit: "Edit", cancel: "Cancel", save: "Save",
+    fixedBudgets: "📌 Fixed Expenses", variableCategories: "📂 Variable Categories",
+    addFixed: "➕ Add Fixed Item", addVariable: "➕ Add Variable Item",
+    namePlaceholder: "Name", budgetPlaceholder: "Budget", add2: "Add",
+    language: "🌐 Language", theme: "🎨 Theme",
+    overBy: "Over by", leftOf: "Left",
+    months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+    reportPrompt: (month, income, fixedT, totalS, rem, rows, exps) =>
+      `You are a financial advisor. Write a professional monthly budget report in English for ${month}. Income: ${income} | Fixed: ${fixedT} | Spent: ${totalS} | Remaining: ${rem}. Categories: ${rows}. Expenses: ${exps}. Write: 1-Summary 2-Key observations 3-Exceeded budgets 4-Tips for next month`,
+  },
+  de: {
+    dir: "ltr", font: "'Inter',sans-serif",
+    appName: "Mein Monatsbudget", salary: "Gehalt", currentMonth: "Aktueller Monat", pastMonth: "Vergangener Monat",
+    dashboard: "Übersicht", add: "Hinzufügen", history: "Verlauf", report: "Bericht", settings: "Einstellungen",
+    fixed: "Fix", spent: "Ausgegeben", remaining: "Verbleibend",
+    variableBudgets: "Variable Budgets", fixedExpenses: "Fixkosten", total: "Gesamt",
+    addExpense: "Ausgabe hinzufügen", desc: "Beschreibung", amount: "Betrag", category: "Kategorie", date: "Datum",
+    saveExpense: "✅ Speichern", saving: "⏳ Speichern...", saved: "✅ Gespeichert", autoSaved: "💾 Automatisch gespeichert",
+    descPlaceholder: "z.B. Supermarkt", amountPlaceholder: "0.00",
+    errorDesc: "Beschreibung eingeben", errorAmount: "Gültigen Betrag eingeben",
+    noExpenses: "Keine Ausgaben diesen Monat", addFirst: "➕ Erste Ausgabe hinzufügen",
+    ops: "Transaktionen", delete: "Löschen",
+    reportTitle: "Monatsbericht", refresh: "🔄 Aktualisieren", print: "🖨️ PDF",
+    monthSummary: "Monatsübersicht", budgetDetails: "Budgetdetails", aiAnalysis: "KI-Analyse",
+    createAnalysis: "🤖 Analyse erstellen", analyzing: "⏳ Analysiere...",
+    budget: "Budget", status: "Status", withinBudget: "✅ Im Rahmen", exceeded: "⚠️ Überschritten",
+    gmailReport: "Wöchentlicher Gmail-Bericht", gmailDesc: "Entwurf in deinem Postfach erstellen",
+    gmailSend: "📤 Senden", gmailSending: "⏳...", gmailSuccess: "✅ Fertig!", gmailError: "❌ Fehler",
+    gmailDone: "✅ Entwurf in Gmail bereit!", gmailFail: "⚠️ Fehler, bitte erneut versuchen.",
+    settingsTitle: "Einstellungen", monthlySalary: "💵 Monatsgehalt", edit: "Bearbeiten", cancel: "Abbrechen", save: "Speichern",
+    fixedBudgets: "📌 Fixkosten", variableCategories: "📂 Variable Kategorien",
+    addFixed: "➕ Fixkosten hinzufügen", addVariable: "➕ Variable Kategorie hinzufügen",
+    namePlaceholder: "Name", budgetPlaceholder: "Budget", add2: "Hinzufügen",
+    language: "🌐 Sprache", theme: "🎨 Design",
+    overBy: "Überschritten um", leftOf: "Verbleibend",
+    months: ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],
+    reportPrompt: (month, income, fixedT, totalS, rem, rows, exps) =>
+      `Du bist ein Finanzberater. Schreibe einen professionellen Monatsbericht auf Deutsch für ${month}. Gehalt: ${income} | Fix: ${fixedT} | Ausgegeben: ${totalS} | Verbleibend: ${rem}. Kategorien: ${rows}. Ausgaben: ${exps}. Schreibe: 1-Zusammenfassung 2-Wichtige Beobachtungen 3-Überschrittene Budgets 4-Tipps für nächsten Monat`,
+  }
+};
+
+// ============ THEMES ============
+const THEMES = {
+  dark:    { name: {ar:"داكن",en:"Dark",de:"Dunkel"},       bg:"linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%)", surface:"rgba(255,255,255,0.04)", border:"rgba(255,255,255,0.08)", text:"#e2e8f0", subtext:"#94a3b8", headerBg:"rgba(255,255,255,0.04)" },
+  light:   { name: {ar:"فاتح",en:"Light",de:"Hell"},         bg:"linear-gradient(135deg,#f0f4ff 0%,#e8eaf6 50%,#f0f4ff 100%)", surface:"rgba(255,255,255,0.8)", border:"rgba(0,0,0,0.08)", text:"#1e293b", subtext:"#64748b", headerBg:"rgba(255,255,255,0.9)" },
+  green:   { name: {ar:"أخضر",en:"Green",de:"Grün"},         bg:"linear-gradient(135deg,#052e16 0%,#064e3b 50%,#052e16 100%)", surface:"rgba(255,255,255,0.05)", border:"rgba(255,255,255,0.1)", text:"#ecfdf5", subtext:"#6ee7b7", headerBg:"rgba(255,255,255,0.05)" },
+  purple:  { name: {ar:"بنفسجي",en:"Purple",de:"Lila"},      bg:"linear-gradient(135deg,#1e0a3c 0%,#3b0764 50%,#1e0a3c 100%)", surface:"rgba(255,255,255,0.05)", border:"rgba(255,255,255,0.1)", text:"#f3e8ff", subtext:"#c4b5fd", headerBg:"rgba(255,255,255,0.05)" },
+  ocean:   { name: {ar:"محيطي",en:"Ocean",de:"Ozean"},       bg:"linear-gradient(135deg,#0c1a2e 0%,#0e3a5f 50%,#0c1a2e 100%)", surface:"rgba(255,255,255,0.05)", border:"rgba(255,255,255,0.1)", text:"#e0f2fe", subtext:"#7dd3fc", headerBg:"rgba(255,255,255,0.05)" },
+  sunset:  { name: {ar:"غروب",en:"Sunset",de:"Sonnenuntergang"}, bg:"linear-gradient(135deg,#1c0a00 0%,#7c2d12 50%,#1c0a00 100%)", surface:"rgba(255,255,255,0.05)", border:"rgba(255,255,255,0.1)", text:"#fff7ed", subtext:"#fdba74", headerBg:"rgba(255,255,255,0.05)" },
+};
+
+const DEFAULT_CONFIG = {
+  income: 1350,
+  fixed: [
+    { id:1, name:"كرت مواصلات", amount:88 },
+    { id:2, name:"إنترنت", amount:25 },
+    { id:3, name:"تأمين سيارة", amount:81 },
+    { id:4, name:"كهرباء", amount:70 },
+    { id:5, name:"أقساط", amount:95 },
+  ],
+  variable: [
+    { id:10, name:"طعام ومشتريات", budget:400, color:"#f59e0b", icon:"🛒" },
+    { id:11, name:"تعبئة وقود", budget:120, color:"#3b82f6", icon:"⛽" },
+    { id:12, name:"مصاريف متغيرة أخرى", budget:261, color:"#8b5cf6", icon:"💳" },
+    { id:13, name:"طوارئ", budget:87, color:"#ef4444", icon:"🚨" },
+    { id:14, name:"توفير", budget:123, color:"#10b981", icon:"💰" },
+  ],
+};
+
+const ICONS = ["🛒","⛽","💳","🚨","💰","🏠","🎓","🍔","💊","✈️","👕","📱","🎮","🐾","🧾"];
+const COLORS = ["#f59e0b","#3b82f6","#8b5cf6","#ef4444","#10b981","#ec4899","#06b6d4","#f97316","#84cc16","#6366f1"];
+
+function getMonthKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;}
+function getMonthLabel(k,lang){const[y,m]=k.split("-");return `${T[lang].months[parseInt(m)-1]} ${y}`;}
+function lsGet(key,fb){try{const v=localStorage.getItem(key);return v?JSON.parse(v):fb;}catch{return fb;}}
+function lsSet(key,val){try{localStorage.setItem(key,JSON.stringify(val));}catch{}}
+
+function App(){
+  const now = new Date();
+  const currentKey = getMonthKey(now);
+
+  const [lang, setLang] = useState(()=>lsGet("budget_lang","ar"));
+  const [theme, setTheme] = useState(()=>lsGet("budget_theme","dark"));
+  const [config, setConfig] = useState(()=>lsGet("budget_config",DEFAULT_CONFIG));
+  const [allData, setAllData] = useState(()=>lsGet("budget_data",{}));
+  const [selectedMonth, setSelectedMonth] = useState(currentKey);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [showMonthPicker, setShowMonthPicker] = useState(false);
+  const [saveFlash, setSaveFlash] = useState("");
+
+  const [editIncome, setEditIncome] = useState(false);
+  const [incomeInput, setIncomeInput] = useState(config.income);
+  const [newFixed, setNewFixed] = useState({name:"",amount:""});
+  const [newVar, setNewVar] = useState({name:"",budget:"",icon:"💳",color:"#8b5cf6"});
+  const [editingFixed, setEditingFixed] = useState(null);
+  const [editingVar, setEditingVar] = useState(null);
+  const [settingsMsg, setSettingsMsg] = useState("");
+
+  const [form, setForm] = useState({desc:"",amount:"",category:config.variable[0]?.name||"",date:now.toISOString().split("T")[0]});
+  const [formError, setFormError] = useState("");
+
+  const [reportText, setReportText] = useState("");
+  const [reportLoading, setReportLoading] = useState(false);
+  const [gmailStatus, setGmailStatus] = useState("");
+
+  const t = T[lang];
+  const th = THEMES[theme];
+
+  useEffect(()=>{
+    document.documentElement.dir = t.dir;
+    document.documentElement.lang = lang;
+  },[lang]);
+
+  const expenses = allData[selectedMonth]||[];
+  const totalFixed = config.fixed.reduce((s,i)=>s+i.amount,0);
+  const totalVarBudget = config.variable.reduce((s,i)=>s+i.budget,0);
+  const totalSpent = expenses.reduce((s,e)=>s+e.amount,0);
+  const remaining = totalVarBudget-totalSpent;
+  const spent = (cat)=>expenses.filter(e=>e.category===cat).reduce((s,e)=>s+e.amount,0);
+
+  const flash = (msg)=>{setSettingsMsg(msg);setTimeout(()=>setSettingsMsg(""),2500);};
+  const flashSave = ()=>{setSaveFlash(t.saved);setTimeout(()=>setSaveFlash(""),2000);};
+
+  const changeLang = (l)=>{ setLang(l); lsSet("budget_lang",l); };
+  const changeTheme = (th)=>{ setTheme(th); lsSet("budget_theme",th); };
+
+  const persistConfig=(c)=>{setConfig(c);lsSet("budget_config",c);flash(t.saved);};
+  const persistData=(d)=>{setAllData(d);lsSet("budget_data",d);flashSave();};
+
+  const allMonths=[...new Set([...Object.keys(allData).filter(k=>(allData[k]||[]).length>0),currentKey])].sort((a,b)=>b.localeCompare(a));
+
+  const addExpense=()=>{
+    if(!form.desc.trim()){setFormError(t.errorDesc);return;}
+    if(!form.amount||isNaN(form.amount)||Number(form.amount)<=0){setFormError(t.errorAmount);return;}
+    const updated={...allData,[selectedMonth]:[{id:Date.now(),...form,amount:Number(form.amount)},...(allData[selectedMonth]||[])]};
+    persistData(updated);
+    setForm({desc:"",amount:"",category:config.variable[0]?.name||"",date:now.toISOString().split("T")[0]});
+    setFormError("");setActiveTab("dashboard");
+  };
+  const deleteExpense=(id)=>persistData({...allData,[selectedMonth]:expenses.filter(e=>e.id!==id)});
+
+  const updateIncome=()=>{persistConfig({...config,income:Number(incomeInput)});setEditIncome(false);};
+  const addFixed=()=>{if(!newFixed.name.trim()||!newFixed.amount||isNaN(newFixed.amount))return;persistConfig({...config,fixed:[...config.fixed,{id:Date.now(),name:newFixed.name.trim(),amount:Number(newFixed.amount)}]});setNewFixed({name:"",amount:""});};
+  const deleteFixed=(id)=>persistConfig({...config,fixed:config.fixed.filter(f=>f.id!==id)});
+  const saveEditFixed=()=>{persistConfig({...config,fixed:config.fixed.map(f=>f.id===editingFixed.id?{...f,name:editingFixed.name,amount:Number(editingFixed.amount)}:f)});setEditingFixed(null);};
+  const addVar=()=>{if(!newVar.name.trim()||!newVar.budget||isNaN(newVar.budget))return;persistConfig({...config,variable:[...config.variable,{id:Date.now(),name:newVar.name.trim(),budget:Number(newVar.budget),icon:newVar.icon,color:newVar.color}]});setNewVar({name:"",budget:"",icon:"💳",color:"#8b5cf6"});};
+  const deleteVar=(id)=>persistConfig({...config,variable:config.variable.filter(v=>v.id!==id)});
+  const saveEditVar=()=>{persistConfig({...config,variable:config.variable.map(v=>v.id===editingVar.id?{...v,...editingVar,budget:Number(editingVar.budget)}:v)});setEditingVar(null);};
+
+  const generateReport=async()=>{
+    setReportLoading(true);setReportText("");
+    const rows=config.variable.map(v=>`${v.name}: ${t.budget} ${v.budget}, ${t.spent} ${spent(v.name).toFixed(2)}, ${t.remaining} ${(v.budget-spent(v.name)).toFixed(2)}`).join(" | ");
+    const exps=expenses.slice(0,20).map(e=>`${e.date}: ${e.desc} ${e.amount}`).join(" | ");
+    const prompt=t.reportPrompt(getMonthLabel(selectedMonth,lang),config.income,totalFixed,totalSpent.toFixed(2),remaining.toFixed(2),rows,exps);
+    try{
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
+      const data=await res.json();
+      setReportText(data.content?.map(i=>i.text||"").join("")||"Error");
+    }catch{setReportText("Error generating report.");}
+    setReportLoading(false);
+  };
+
+  const sendGmailDraft=async()=>{
+    setGmailStatus("loading");
+    const rows=config.variable.map(v=>`• ${v.name}: ${v.budget} / ${spent(v.name).toFixed(2)} ${spent(v.name)>v.budget?"⚠️":"✅"}`).join("\n");
+    const body=`${t.appName} - ${getMonthLabel(selectedMonth,lang)}\n\n${t.salary}: ${config.income} | ${t.fixed}: ${totalFixed} | ${t.spent}: ${totalSpent.toFixed(2)} | ${t.remaining}: ${remaining.toFixed(2)}\n\n${rows}\n\n${expenses.slice(0,20).map(e=>`• ${e.date} | ${e.desc} | ${e.amount}`).join("\n")}`;
+    try{
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:300,mcp_servers:[{type:"url",url:"https://gmailmcp.googleapis.com/mcp/v1",name:"gmail"}],messages:[{role:"user",content:`Create Gmail draft: subject="${t.appName} - ${getMonthLabel(selectedMonth,lang)}", body="${body}". Reply: SUCCESS or FAILED`}]})});
+      const data=await res.json();
+      const text=data.content?.find(b=>b.type==="text")?.text||"";
+      setGmailStatus(text.toLowerCase().includes("success")?"success":"error");
+    }catch{setGmailStatus("error");}
+    setTimeout(()=>setGmailStatus(""),4000);
+  };
+
+  // Styles
+  const C=(extra={})=>({background:th.surface,border:`1px solid ${th.border}`,borderRadius:16,padding:16,...extra});
+  const I=(extra={})=>({width:"100%",background:th.surface,border:`1px solid ${th.border}`,borderRadius:10,padding:"9px 12px",color:th.text,fontSize:13,fontFamily:t.font,outline:"none",boxSizing:"border-box",...extra});
+  const B=(bg,extra={})=>({background:bg,border:"none",borderRadius:9,padding:"8px 14px",color:"#fff",fontSize:12,fontFamily:t.font,fontWeight:700,cursor:"pointer",...extra});
+
+  const TABS=[["dashboard","📊"],["add","➕"],["history","📋"],["report","📄"],["settings","⚙️"]];
+  const TL={dashboard:t.dashboard,add:t.add,history:t.history,report:t.report,settings:t.settings};
+
+  return (
+    <div className="theme-transition" style={{direction:t.dir,fontFamily:t.font,minHeight:"100vh",background:th.bg,color:th.text}}>
+
+      {/* Header */}
+      <div className="no-print" style={{background:th.headerBg,borderBottom:`1px solid ${th.border}`,padding:"14px 18px",backdropFilter:"blur(20px)"}}>
+        <div style={{maxWidth:620,margin:"0 auto"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+            <div>
+              <h1 style={{margin:0,fontSize:19,fontWeight:900,background:"linear-gradient(90deg,#a78bfa,#60a5fa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>{t.appName}</h1>
+              <span style={{fontSize:10,color:"#10b981"}}>{saveFlash||t.autoSaved}</span>
+            </div>
+            <div style={{background:"rgba(16,185,129,0.1)",border:"1px solid rgba(16,185,129,0.3)",borderRadius:10,padding:"6px 14px",textAlign:"center"}}>
+              <p style={{margin:0,fontSize:10,color:"#6ee7b7"}}>{t.salary}</p>
+              <p style={{margin:0,fontSize:18,fontWeight:900,color:"#10b981"}}>{config.income}</p>
+            </div>
+          </div>
+
+          {/* Month picker */}
+          <div style={{position:"relative"}}>
+            <button onClick={()=>setShowMonthPicker(!showMonthPicker)} style={{width:"100%",background:"rgba(124,58,237,0.15)",border:"1px solid rgba(124,58,237,0.4)",borderRadius:10,padding:"8px 14px",color:"#c4b5fd",fontSize:13,fontFamily:t.font,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <span>📅 {getMonthLabel(selectedMonth,lang)}</span>
+              <span style={{fontSize:11,color:"#7c3aed"}}>{selectedMonth===currentKey?t.currentMonth:t.pastMonth} ▼</span>
+            </button>
+            {showMonthPicker&&(
+              <div style={{position:"absolute",top:"110%",[t.dir==="rtl"?"right":"left"]:0,[t.dir==="rtl"?"left":"right"]:0,background:theme==="light"?"#f8fafc":"#1e1b4b",border:"1px solid rgba(124,58,237,0.4)",borderRadius:10,zIndex:100,overflow:"hidden",boxShadow:"0 8px 32px rgba(0,0,0,0.4)"}}>
+                {allMonths.map(k=>(
+                  <button key={k} onClick={()=>{setSelectedMonth(k);setShowMonthPicker(false);}} style={{width:"100%",padding:"10px 16px",background:k===selectedMonth?"rgba(124,58,237,0.3)":"transparent",border:"none",borderBottom:`1px solid ${th.border}`,color:k===selectedMonth?"#c4b5fd":th.subtext,fontSize:13,fontFamily:t.font,cursor:"pointer",textAlign:t.dir==="rtl"?"right":"left"}}>
+                    {getMonthLabel(k,lang)} {k===currentKey?"🟢":""}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="no-print" style={{maxWidth:620,margin:"0 auto",padding:"12px 18px 0"}}>
+        <div style={{display:"flex",gap:5,background:"rgba(255,255,255,0.05)",borderRadius:12,padding:4}}>
+          {TABS.map(([tab,icon])=>(
+            <button key={tab} onClick={()=>setActiveTab(tab)} style={{flex:1,padding:"9px 2px",borderRadius:9,border:"none",cursor:"pointer",fontSize:16,transition:"all 0.2s",background:activeTab===tab?"linear-gradient(135deg,#7c3aed,#2563eb)":"transparent",color:activeTab===tab?"#fff":th.subtext}}>{icon}</button>
+          ))}
+        </div>
+        <div style={{display:"flex",justifyContent:"space-around",marginTop:3}}>
+          {TABS.map(([tab])=>(
+            <span key={tab} style={{fontSize:9,color:activeTab===tab?"#c4b5fd":th.subtext,flex:1,textAlign:"center"}}>{TL[tab]}</span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{maxWidth:620,margin:"0 auto",padding:"12px 18px 40px"}}>
+
+        {/* DASHBOARD */}
+        {activeTab==="dashboard"&&(
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+              {[{label:t.fixed,value:totalFixed,color:"#f59e0b",bg:"rgba(245,158,11,0.1)",border:"rgba(245,158,11,0.3)"},{label:t.spent,value:totalSpent.toFixed(2),color:"#ef4444",bg:"rgba(239,68,68,0.1)",border:"rgba(239,68,68,0.3)"},{label:t.remaining,value:remaining.toFixed(2),color:remaining>=0?"#10b981":"#ef4444",bg:remaining>=0?"rgba(16,185,129,0.1)":"rgba(239,68,68,0.1)",border:remaining>=0?"rgba(16,185,129,0.3)":"rgba(239,68,68,0.3)"}].map(c=>(
+                <div key={c.label} style={{background:c.bg,border:`1px solid ${c.border}`,borderRadius:12,padding:"11px 8px",textAlign:"center"}}>
+                  <p style={{margin:0,fontSize:10,color:th.subtext,marginBottom:3}}>{c.label}</p>
+                  <p style={{margin:0,fontSize:16,fontWeight:900,color:c.color}}>{c.value}</p>
+                </div>
+              ))}
+            </div>
+            <div style={C()}>
+              <h3 style={{margin:"0 0 12px",fontSize:13,fontWeight:700,color:"#c4b5fd"}}>{t.variableBudgets} — {getMonthLabel(selectedMonth,lang)}</h3>
+              {config.variable.map(v=>{const s=spent(v.name);const p=Math.min((s/v.budget)*100,100);const over=s>v.budget;return(
+                <div key={v.id} style={{marginBottom:13}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
+                    <span style={{fontSize:13,fontWeight:600}}>{v.icon} {v.name}</span>
+                    <span style={{fontSize:12}}><span style={{color:over?"#ef4444":th.text,fontWeight:700}}>{s.toFixed(2)}</span><span style={{color:th.subtext}}> / {v.budget}</span></span>
+                  </div>
+                  <div style={{height:7,background:"rgba(255,255,255,0.08)",borderRadius:99,overflow:"hidden"}}>
+                    <div style={{height:"100%",width:`${p}%`,background:over?"#ef4444":v.color,borderRadius:99,transition:"width 0.5s"}}/>
+                  </div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
+                    <span style={{fontSize:10,color:th.subtext}}>{p.toFixed(0)}%</span>
+                    <span style={{fontSize:10,color:over?"#ef4444":"#10b981"}}>{over?`⚠️ ${t.overBy} ${(s-v.budget).toFixed(2)}`:`✅ ${t.leftOf} ${(v.budget-s).toFixed(2)}`}</span>
+                  </div>
+                </div>
+              );})}
+            </div>
+            <div style={C()}>
+              <h3 style={{margin:"0 0 10px",fontSize:13,fontWeight:700,color:"#fbbf24"}}>📌 {t.fixedExpenses}</h3>
+              {config.fixed.map(f=>(
+                <div key={f.id} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:`1px solid ${th.border}`}}>
+                  <span style={{fontSize:13,color:th.text}}>{f.name}</span>
+                  <span style={{fontSize:13,fontWeight:700,color:"#fbbf24"}}>{f.amount}</span>
+                </div>
+              ))}
+              <div style={{display:"flex",justifyContent:"space-between",paddingTop:8,marginTop:4}}>
+                <span style={{fontSize:13,fontWeight:700}}>{t.total}</span>
+                <span style={{fontSize:15,fontWeight:900,color:"#fbbf24"}}>{totalFixed}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ADD */}
+        {activeTab==="add"&&(
+          <div style={{...C(),display:"flex",flexDirection:"column",gap:13}}>
+            <h3 style={{margin:0,fontSize:15,fontWeight:700,color:"#a78bfa"}}>➕ {t.addExpense} — {getMonthLabel(selectedMonth,lang)}</h3>
+            {formError&&<div style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.3)",borderRadius:10,padding:"9px 13px",fontSize:13,color:"#fca5a5"}}>{formError}</div>}
+            {[{label:t.desc,key:"desc",type:"text",ph:t.descPlaceholder},{label:t.amount,key:"amount",type:"number",ph:t.amountPlaceholder}].map(f=>(
+              <div key={f.key}>
+                <label style={{fontSize:12,color:th.subtext,display:"block",marginBottom:5}}>{f.label}</label>
+                <input type={f.type} placeholder={f.ph} value={form[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})} style={I()}/>
+              </div>
+            ))}
+            <div>
+              <label style={{fontSize:12,color:th.subtext,display:"block",marginBottom:5}}>{t.category}</label>
+              <select value={form.category} onChange={e=>setForm({...form,category:e.target.value})} style={{...I(),background:theme==="light"?"#f0f4ff":"#1e1b4b"}}>
+                {config.variable.map(v=><option key={v.id} value={v.name}>{v.icon} {v.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{fontSize:12,color:th.subtext,display:"block",marginBottom:5}}>{t.date}</label>
+              <input type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} style={I()}/>
+            </div>
+            <button onClick={addExpense} style={B("linear-gradient(135deg,#7c3aed,#2563eb)",{padding:"12px",fontSize:14,borderRadius:12,width:"100%"})}>{t.saveExpense}</button>
+          </div>
+        )}
+
+        {/* HISTORY */}
+        {activeTab==="history"&&(
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <h3 style={{margin:0,fontSize:14,fontWeight:700,color:"#a78bfa"}}>📋 {t.history} — {getMonthLabel(selectedMonth,lang)}</h3>
+              <span style={{fontSize:12,color:th.subtext}}>{expenses.length} {t.ops} • {totalSpent.toFixed(2)}</span>
+            </div>
+            {expenses.length===0?(
+              <div style={{...C(),textAlign:"center",padding:36,color:th.subtext}}>
+                <p style={{fontSize:28,margin:"0 0 8px"}}>📭</p>
+                <p style={{margin:0,fontSize:14}}>{t.noExpenses}</p>
+                <button onClick={()=>setActiveTab("add")} style={{...B("linear-gradient(135deg,#7c3aed,#2563eb)"),marginTop:12,padding:"9px 18px",fontSize:13}}>{t.addFirst}</button>
+              </div>
+            ):expenses.map(e=>{const cat=config.variable.find(v=>v.name===e.category);return(
+              <div key={e.id} style={{...C({padding:"11px 15px"}),display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{flex:1}}>
+                  <p style={{margin:0,fontSize:14,fontWeight:700}}>{e.desc}</p>
+                  <div style={{display:"flex",gap:7,marginTop:4,alignItems:"center"}}>
+                    <span style={{fontSize:10,background:`${cat?.color||"#94a3b8"}22`,color:cat?.color||"#94a3b8",border:`1px solid ${cat?.color||"#94a3b8"}44`,borderRadius:6,padding:"2px 7px"}}>{cat?.icon} {e.category}</span>
+                    <span style={{fontSize:11,color:th.subtext}}>{e.date}</span>
+                  </div>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:9}}>
+                  <span style={{fontSize:15,fontWeight:900,color:"#ef4444"}}>-{e.amount}</span>
+                  <button onClick={()=>deleteExpense(e.id)} style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.3)",borderRadius:8,padding:"3px 9px",color:"#fca5a5",cursor:"pointer",fontSize:12,fontFamily:t.font}}>{t.delete}</button>
+                </div>
+              </div>
+            );})}
+          </div>
+        )}
+
+        {/* REPORT */}
+        {activeTab==="report"&&(
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+            <div className="no-print" style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <h3 style={{margin:0,fontSize:14,fontWeight:700,color:"#a78bfa"}}>📄 {t.reportTitle} — {getMonthLabel(selectedMonth,lang)}</h3>
+              <div style={{display:"flex",gap:7}}>
+                <button onClick={generateReport} style={B("rgba(124,58,237,0.3)",{border:"1px solid rgba(124,58,237,0.5)",color:"#c4b5fd"})}>{t.refresh}</button>
+                <button onClick={()=>window.print()} style={B("linear-gradient(135deg,#7c3aed,#2563eb)")}>{t.print}</button>
+              </div>
+            </div>
+            <div style={{background:"rgba(234,67,53,0.08)",border:"1px solid rgba(234,67,53,0.25)",borderRadius:14,padding:"14px 16px"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div>
+                  <p style={{margin:0,fontSize:13,fontWeight:700,color:"#fca5a5"}}>📧 {t.gmailReport}</p>
+                  <p style={{margin:"3px 0 0",fontSize:11,color:th.subtext}}>{t.gmailDesc}</p>
+                </div>
+                <button onClick={sendGmailDraft} disabled={gmailStatus==="loading"} style={B("linear-gradient(135deg,#ea4335,#c62828)",{padding:"10px 16px",opacity:gmailStatus==="loading"?0.7:1})}>
+                  {gmailStatus==="loading"?t.gmailSending:gmailStatus==="success"?t.gmailSuccess:gmailStatus==="error"?t.gmailError:t.gmailSend}
+                </button>
+              </div>
+              {gmailStatus==="success"&&<p style={{margin:"8px 0 0",fontSize:12,color:"#6ee7b7"}}>{t.gmailDone}</p>}
+              {gmailStatus==="error"&&<p style={{margin:"8px 0 0",fontSize:12,color:"#fca5a5"}}>{t.gmailFail}</p>}
+            </div>
+            <div className="print-area" style={C({padding:18})}>
+              <h4 style={{margin:"0 0 10px",fontSize:13,color:"#60a5fa"}}>{t.monthSummary}</h4>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:14}}>
+                {[{label:t.salary,value:config.income,color:"#10b981"},{label:t.fixedExpenses,value:totalFixed,color:"#f59e0b"},{label:t.spent,value:totalSpent.toFixed(2),color:"#ef4444"},{label:t.remaining,value:remaining.toFixed(2),color:remaining>=0?"#10b981":"#ef4444"}].map(r=>(
+                  <div key={r.label} style={{background:th.surface,borderRadius:10,padding:"9px 12px"}}>
+                    <p style={{margin:0,fontSize:11,color:th.subtext}}>{r.label}</p>
+                    <p style={{margin:0,fontSize:17,fontWeight:900,color:r.color}}>{r.value}</p>
+                  </div>
+                ))}
+              </div>
+              <h4 style={{margin:"0 0 8px",fontSize:13,color:"#60a5fa"}}>{t.budgetDetails}</h4>
+              <table style={{width:"100%",borderCollapse:"collapse",marginBottom:14,fontSize:12}}>
+                <thead><tr style={{borderBottom:`1px solid ${th.border}`}}>
+                  {[t.category,t.budget,t.spent,t.remaining,t.status].map(h=><th key={h} style={{padding:"7px 5px",color:th.subtext,fontWeight:600,textAlign:t.dir==="rtl"?"right":"left"}}>{h}</th>)}
+                </tr></thead>
+                <tbody>
+                  {config.variable.map(v=>{const s=spent(v.name);const r=v.budget-s;return(
+                    <tr key={v.id} style={{borderBottom:`1px solid ${th.border}`}}>
+                      <td style={{padding:"7px 5px"}}>{v.icon} {v.name}</td>
+                      <td style={{padding:"7px 5px",color:th.subtext}}>{v.budget}</td>
+                      <td style={{padding:"7px 5px",color:"#ef4444",fontWeight:700}}>{s.toFixed(2)}</td>
+                      <td style={{padding:"7px 5px",color:r>=0?"#10b981":"#ef4444",fontWeight:700}}>{r.toFixed(2)}</td>
+                      <td style={{padding:"7px 5px",fontSize:11}}>{r>=0?t.withinBudget:t.exceeded}</td>
+                    </tr>
+                  );})}
+                </tbody>
+              </table>
+              <h4 style={{margin:"0 0 8px",fontSize:13,color:"#60a5fa"}}>{t.aiAnalysis}</h4>
+              {!reportText?(
+                <button onClick={generateReport} style={B("linear-gradient(135deg,#7c3aed,#2563eb)",{width:"100%",padding:"12px",fontSize:13,borderRadius:12})}>{t.createAnalysis}</button>
+              ):reportLoading?(
+                <div style={{textAlign:"center",padding:24,color:th.subtext}}><p style={{margin:0}}>{t.analyzing}</p></div>
+              ):(
+                <div style={{fontSize:13,lineHeight:1.9,color:th.text,whiteSpace:"pre-wrap"}}>{reportText}</div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* SETTINGS */}
+        {activeTab==="settings"&&(
+          <div style={{display:"flex",flexDirection:"column",gap:14}}>
+            <h3 style={{margin:0,fontSize:15,fontWeight:700,color:"#a78bfa"}}>⚙️ {t.settingsTitle}</h3>
+            {settingsMsg&&<div style={{background:"rgba(16,185,129,0.1)",border:"1px solid rgba(16,185,129,0.3)",borderRadius:10,padding:"9px 14px",fontSize:13,color:"#6ee7b7"}}>{settingsMsg}</div>}
+
+            {/* Language */}
+            <div style={C()}>
+              <h4 style={{margin:"0 0 12px",fontSize:13,color:"#60a5fa"}}>{t.language}</h4>
+              <div style={{display:"flex",gap:8}}>
+                {[["ar","العربية","🇸🇦"],["en","English","🇬🇧"],["de","Deutsch","🇩🇪"]].map(([code,label,flag])=>(
+                  <button key={code} onClick={()=>changeLang(code)} style={{flex:1,padding:"10px 6px",borderRadius:10,border:`2px solid ${lang===code?"#7c3aed":th.border}`,background:lang===code?"rgba(124,58,237,0.2)":th.surface,color:th.text,fontSize:12,fontFamily:t.font,fontWeight:700,cursor:"pointer"}}>
+                    {flag}<br/>{label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Theme */}
+            <div style={C()}>
+              <h4 style={{margin:"0 0 12px",fontSize:13,color:"#60a5fa"}}>{t.theme}</h4>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+                {Object.entries(THEMES).map(([key,th2])=>(
+                  <button key={key} onClick={()=>changeTheme(key)} style={{padding:"10px 6px",borderRadius:10,border:`2px solid ${theme===key?"#7c3aed":th.border}`,background:th2.bg,color:th2.text,fontSize:11,fontFamily:t.font,fontWeight:700,cursor:"pointer",minHeight:50}}>
+                    {th2.name[lang]||th2.name.en}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Income */}
+            <div style={C()}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:editIncome?12:0}}>
+                <h4 style={{margin:0,fontSize:13,color:"#fbbf24"}}>{t.monthlySalary}</h4>
+                <button onClick={()=>setEditIncome(!editIncome)} style={B(editIncome?"rgba(239,68,68,0.2)":"rgba(251,191,36,0.2)",{color:editIncome?"#fca5a5":"#fbbf24",border:`1px solid ${editIncome?"rgba(239,68,68,0.3)":"rgba(251,191,36,0.3)"}`})}>{editIncome?t.cancel:t.edit}</button>
+              </div>
+              {editIncome?(
+                <div style={{display:"flex",gap:8}}>
+                  <input type="number" value={incomeInput} onChange={e=>setIncomeInput(e.target.value)} style={{...I(),flex:1}}/>
+                  <button onClick={updateIncome} style={B("linear-gradient(135deg,#7c3aed,#2563eb)",{padding:"9px 16px"})}>{t.save}</button>
+                </div>
+              ):(<p style={{margin:"8px 0 0",fontSize:22,fontWeight:900,color:"#10b981"}}>{config.income}</p>)}
+            </div>
+
+            {/* Fixed */}
+            <div style={C()}>
+              <h4 style={{margin:"0 0 12px",fontSize:13,color:"#fbbf24"}}>{t.fixedBudgets}</h4>
+              {config.fixed.map(f=>(
+                <div key={f.id} style={{marginBottom:8}}>
+                  {editingFixed?.id===f.id?(
+                    <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                      <input value={editingFixed.name} onChange={e=>setEditingFixed({...editingFixed,name:e.target.value})} style={{...I(),flex:2}}/>
+                      <input type="number" value={editingFixed.amount} onChange={e=>setEditingFixed({...editingFixed,amount:e.target.value})} style={{...I(),flex:1}}/>
+                      <button onClick={saveEditFixed} style={B("linear-gradient(135deg,#7c3aed,#2563eb)",{padding:"8px 10px"})}>✅</button>
+                      <button onClick={()=>setEditingFixed(null)} style={B("rgba(239,68,68,0.2)",{color:"#fca5a5",border:"1px solid rgba(239,68,68,0.3)",padding:"8px 10px"})}>✕</button>
+                    </div>
+                  ):(
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",background:"rgba(255,255,255,0.03)",borderRadius:9,padding:"8px 12px"}}>
+                      <span style={{fontSize:13,color:th.text}}>{f.name} <span style={{color:"#fbbf24",fontWeight:700}}>({f.amount})</span></span>
+                      <div style={{display:"flex",gap:6}}>
+                        <button onClick={()=>setEditingFixed({...f})} style={B("rgba(124,58,237,0.2)",{color:"#c4b5fd",border:"1px solid rgba(124,58,237,0.3)",padding:"4px 10px"})}>✏️</button>
+                        <button onClick={()=>deleteFixed(f.id)} style={B("rgba(239,68,68,0.15)",{color:"#fca5a5",border:"1px solid rgba(239,68,68,0.3)",padding:"4px 10px"})}>🗑️</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+              <div style={{borderTop:`1px solid ${th.border}`,paddingTop:10,marginTop:6}}>
+                <p style={{margin:"0 0 7px",fontSize:12,color:th.subtext}}>{t.addFixed}</p>
+                <div style={{display:"flex",gap:6}}>
+                  <input placeholder={t.namePlaceholder} value={newFixed.name} onChange={e=>setNewFixed({...newFixed,name:e.target.value})} style={{...I(),flex:2}}/>
+                  <input type="number" placeholder={t.amountPlaceholder} value={newFixed.amount} onChange={e=>setNewFixed({...newFixed,amount:e.target.value})} style={{...I(),flex:1}}/>
+                  <button onClick={addFixed} style={B("linear-gradient(135deg,#7c3aed,#2563eb)",{padding:"8px 12px"})}>{t.add2}</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Variable */}
+            <div style={C()}>
+              <h4 style={{margin:"0 0 12px",fontSize:13,color:"#c4b5fd"}}>{t.variableCategories}</h4>
+              {config.variable.map(v=>(
+                <div key={v.id} style={{marginBottom:8}}>
+                  {editingVar?.id===v.id?(
+                    <div style={{display:"flex",flexDirection:"column",gap:6,background:"rgba(255,255,255,0.04)",borderRadius:10,padding:10}}>
+                      <div style={{display:"flex",gap:6}}>
+                        <input value={editingVar.name} onChange={e=>setEditingVar({...editingVar,name:e.target.value})} style={{...I(),flex:2}}/>
+                        <input type="number" value={editingVar.budget} onChange={e=>setEditingVar({...editingVar,budget:e.target.value})} style={{...I(),flex:1}}/>
+                      </div>
+                      <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                        {ICONS.map(ic=><button key={ic} onClick={()=>setEditingVar({...editingVar,icon:ic})} style={{background:editingVar.icon===ic?"rgba(124,58,237,0.4)":"rgba(255,255,255,0.05)",border:editingVar.icon===ic?"1px solid #7c3aed":"1px solid transparent",borderRadius:6,padding:"4px 6px",cursor:"pointer",fontSize:14}}>{ic}</button>)}
+                      </div>
+                      <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+                        {COLORS.map(c=><button key={c} onClick={()=>setEditingVar({...editingVar,color:c})} style={{width:22,height:22,borderRadius:"50%",background:c,border:editingVar.color===c?"2px solid white":"2px solid transparent",cursor:"pointer"}}/>)}
+                      </div>
+                      <div style={{display:"flex",gap:6}}>
+                        <button onClick={saveEditVar} style={B("linear-gradient(135deg,#7c3aed,#2563eb)",{flex:1,padding:"9px"})}>✅ {t.save}</button>
+                        <button onClick={()=>setEditingVar(null)} style={B("rgba(239,68,68,0.2)",{color:"#fca5a5",border:"1px solid rgba(239,68,68,0.3)",padding:"9px 14px"})}>{t.cancel}</button>
+                      </div>
+                    </div>
+                  ):(
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",background:"rgba(255,255,255,0.03)",borderRadius:9,padding:"8px 12px"}}>
+                      <span style={{fontSize:13,color:th.text}}>{v.icon} {v.name} <span style={{color:v.color,fontWeight:700}}>({v.budget})</span></span>
+                      <div style={{display:"flex",gap:6}}>
+                        <button onClick={()=>setEditingVar({...v})} style={B("rgba(124,58,237,0.2)",{color:"#c4b5fd",border:"1px solid rgba(124,58,237,0.3)",padding:"4px 10px"})}>✏️</button>
+                        <button onClick={()=>deleteVar(v.id)} style={B("rgba(239,68,68,0.15)",{color:"#fca5a5",border:"1px solid rgba(239,68,68,0.3)",padding:"4px 10px"})}>🗑️</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+              <div style={{borderTop:`1px solid ${th.border}`,paddingTop:10,marginTop:6}}>
+                <p style={{margin:"0 0 7px",fontSize:12,color:th.subtext}}>{t.addVariable}</p>
+                <div style={{display:"flex",gap:6,marginBottom:7}}>
+                  <input placeholder={t.namePlaceholder} value={newVar.name} onChange={e=>setNewVar({...newVar,name:e.target.value})} style={{...I(),flex:2}}/>
+                  <input type="number" placeholder={t.budgetPlaceholder} value={newVar.budget} onChange={e=>setNewVar({...newVar,budget:e.target.value})} style={{...I(),flex:1}}/>
+                </div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:7}}>
+                  {ICONS.map(ic=><button key={ic} onClick={()=>setNewVar({...newVar,icon:ic})} style={{background:newVar.icon===ic?"rgba(124,58,237,0.4)":"rgba(255,255,255,0.05)",border:newVar.icon===ic?"1px solid #7c3aed":"1px solid transparent",borderRadius:6,padding:"4px 6px",cursor:"pointer",fontSize:14}}>{ic}</button>)}
+                </div>
+                <div style={{display:"flex",gap:4,marginBottom:10,flexWrap:"wrap"}}>
+                  {COLORS.map(c=><button key={c} onClick={()=>setNewVar({...newVar,color:c})} style={{width:22,height:22,borderRadius:"50%",background:c,border:newVar.color===c?"2px solid white":"2px solid transparent",cursor:"pointer"}}/>)}
+                </div>
+                <button onClick={addVar} style={B("linear-gradient(135deg,#7c3aed,#2563eb)",{width:"100%",padding:"10px",fontSize:13,borderRadius:10})}>{t.addVariable}</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
