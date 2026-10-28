@@ -32,6 +32,8 @@ body.dark, body.midnight, body.forest, body.ocean, body.rose, body.slate{
   --plus:#5fc4a5; --minus:#e0795c; --warn:#d9a640;
   --on-ink:#121715; --scrim:rgba(0,0,0,.6);
 }
+body.sky{--paper:#eef4fb;--card:#ffffff;--card2:#e4eef9;--line:#d6e3f1;--ring:#0a84ff;--track:#d6e3f1;--plus:#0a7ac2}
+body.sand{--paper:#f7f1e8;--card:#fffdf9;--card2:#f0e7da;--line:#e6dac8;--ring:#b4692e;--track:#e6dac8}
 body.dark    { --paper:#121715; --card:#1b2320; --card2:#222c28; --line:#2c3733; --ring:#5fc4a5; --track:#2c3733; }
 body.midnight{ --paper:#0b0e15; --card:#131824; --card2:#192030; --line:#242c3e; --ring:#8da2fb; --track:#242c3e; }
 body.forest  { --paper:#0d1511; --card:#14201a; --card2:#1a2a22; --line:#24362c; --ring:#6fcf97; --track:#24362c; }
@@ -199,6 +201,23 @@ select.inp{appearance:auto}
 .pick-c.on{border-color:var(--ink)}
 .set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
 .set-row:last-of-type{border-bottom:0}
+.sgrp-t{font-size:12px;font-weight:500;color:var(--ink-faint);margin:18px 6px 6px;letter-spacing:.3px}
+.sgrp{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:6px}
+.srow{width:100%;display:flex;align-items:center;gap:12px;background:none;border:0;border-bottom:1px solid var(--line);padding:13px 16px;text-align:start;font-size:15px;color:var(--ink)}
+.sgrp .srow:last-child{border-bottom:0}
+.srow:active{background:var(--card2)}
+.srow-ic{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:16px;flex:none;background:var(--card2)}
+.srow-l{flex:1;min-width:0}
+.srow-v{color:var(--ink-soft);font-size:14px;white-space:nowrap}
+.srow-ck{color:var(--ring);font-weight:600;font-size:16px}
+.chev{color:var(--ink-faint);font-size:20px;line-height:1;display:inline-block}
+html[dir="rtl"] .chev{transform:scaleX(-1)}
+.th-sw{width:30px;height:30px;border-radius:50%;flex:none;border:1px solid var(--line);position:relative;overflow:hidden}
+.th-sw i{position:absolute;inset-inline-end:0;top:0;bottom:0;width:50%}
+.back{display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:var(--ring);font-size:15px;padding:4px 0;margin:0 0 6px}
+.back .chev{color:var(--ring);transform:scaleX(-1)}
+html[dir="rtl"] .back .chev{transform:none}
+.month-item .mi-v{font-size:12px;opacity:.7}
 .edit-box{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card2);display:flex;flex-direction:column;gap:10px}
 .add-box{border-top:1px solid var(--line);padding-top:14px;margin-top:8px}
 
@@ -299,6 +318,8 @@ const T = {
     gmail:"تقرير Gmail",gmailDesc:"مسودة جاهزة",
     send:"إرسال",sending:"...",ok:"✓ تم",err:"✗ خطأ",
     gmailDone:"✓ المسودة جاهزة في Gmail!",gmailFail:"حدث خطأ",
+    general:"عام",budgetFor:"ميزانية",back:"رجوع",lightThemes:"ثيمات فاتحة",darkThemes:"ثيمات داكنة",itemsN:"بنود",catsN:"فئات",appSec:"التطبيق",version:"الإصدار",
+    monthNote:"هذه الإعدادات خاصة بشهر {m} فقط. الأشهر السابقة تحتفظ بأرقامها، وكل شهر جديد يبدأ بنسخة من إعدادات آخر شهر.",
     aiOff:"ميزات الذكاء الاصطناعي (التحليل الذكي وتقرير Gmail) تعمل فقط عند فتح التطبيق داخل Claude. باقي الميزات تعمل بالكامل على الهاتف، ويمكنك تصدير التقرير PDF أو Excel.",
     monthlySalary:"الراتب الشهري",fixedCats:"المصاريف الثابتة",varCats:"فئات الإنفاق",
     addFixed:"إضافة بند ثابت",addVar:"إضافة فئة",namePh:"الاسم",
@@ -329,6 +350,8 @@ const T = {
     gmail:"Gmail Report",gmailDesc:"Ready draft",
     send:"Send",sending:"...",ok:"✓ Done",err:"✗ Error",
     gmailDone:"✓ Draft ready in Gmail!",gmailFail:"Error. Try again.",
+    general:"General",budgetFor:"Budget",back:"Back",lightThemes:"Light themes",darkThemes:"Dark themes",itemsN:"items",catsN:"categories",appSec:"App",version:"Version",
+    monthNote:"These settings apply to {m} only. Past months keep their own numbers, and each new month starts with a copy of the latest month.",
     aiOff:"AI features (AI Analysis and Gmail Report) only work when the app is opened inside Claude. Everything else works fully on your phone, and you can still export the report as PDF or Excel.",
     monthlySalary:"Monthly Salary",fixedCats:"Fixed Expenses",varCats:"Variable Categories",
     addFixed:"Add Fixed Item",addVar:"Add Category",namePh:"Name",
@@ -359,6 +382,8 @@ const T = {
     gmail:"Gmail Bericht",gmailDesc:"Entwurf bereit",
     send:"Senden",sending:"...",ok:"✓ Fertig",err:"✗ Fehler",
     gmailDone:"✓ Entwurf in Gmail bereit!",gmailFail:"Fehler. Erneut versuchen.",
+    general:"Allgemein",budgetFor:"Budget",back:"Zurück",lightThemes:"Helle Themes",darkThemes:"Dunkle Themes",itemsN:"Posten",catsN:"Kategorien",appSec:"App",version:"Version",
+    monthNote:"Diese Einstellungen gelten nur für {m}. Frühere Monate behalten ihre Zahlen, und jeder neue Monat startet mit einer Kopie des letzten Monats.",
     aiOff:"KI-Funktionen (KI-Analyse und Gmail Bericht) funktionieren nur, wenn die App in Claude geöffnet wird. Alles andere funktioniert vollständig auf dem Handy, und der Bericht lässt sich weiterhin als PDF oder Excel exportieren.",
     monthlySalary:"Monatsgehalt",fixedCats:"Fixkosten",varCats:"Variable Kategorien",
     addFixed:"Fixkosten hinzufügen",addVar:"Kategorie hinzufügen",namePh:"Name",
@@ -376,9 +401,10 @@ const T = {
   }
 };
 
-const THEME_NAMES={light:{ar:"فاتح",en:"Light",de:"Hell"},dark:{ar:"داكن",en:"Dark",de:"Dunkel"},midnight:{ar:"منتصف الليل",en:"Midnight",de:"Mitternacht"},forest:{ar:"غابة",en:"Forest",de:"Wald"},ocean:{ar:"محيط",en:"Ocean",de:"Ozean"},rose:{ar:"وردي",en:"Rose",de:"Rosa"},slate:{ar:"رمادي",en:"Slate",de:"Schiefer"}};
-const THEME_ACCENT={light:"#2f6f5e",dark:"#5fc4a5",midnight:"#8da2fb",forest:"#6fcf97",ocean:"#4cb8ea",rose:"#f0788c",slate:"#e8b04a"};
-const THEME_BG={light:"#f5f3ee",dark:"#121715",midnight:"#0b0e15",forest:"#0d1511",ocean:"#0b141b",rose:"#181112",slate:"#14161a"};
+const THEME_NAMES={light:{ar:"فاتح",en:"Light",de:"Hell"},sky:{ar:"سماء",en:"Sky",de:"Himmel"},sand:{ar:"رملي",en:"Sand",de:"Sand"},dark:{ar:"داكن",en:"Dark",de:"Dunkel"},midnight:{ar:"منتصف الليل",en:"Midnight",de:"Mitternacht"},forest:{ar:"غابة",en:"Forest",de:"Wald"},ocean:{ar:"محيط",en:"Ocean",de:"Ozean"},rose:{ar:"وردي",en:"Rose",de:"Rosa"},slate:{ar:"رمادي",en:"Slate",de:"Schiefer"}};
+const THEME_ACCENT={light:"#2f6f5e",sky:"#0a84ff",sand:"#b4692e",dark:"#5fc4a5",midnight:"#8da2fb",forest:"#6fcf97",ocean:"#4cb8ea",rose:"#f0788c",slate:"#e8b04a"};
+const LIGHT_THEMES=["light","sky","sand"];
+const THEME_BG={light:"#f5f3ee",sky:"#eef4fb",sand:"#f7f1e8",dark:"#121715",midnight:"#0b0e15",forest:"#0d1511",ocean:"#0b141b",rose:"#181112",slate:"#14161a"};
 
 // Default variable categories with keys for translation
 const DEFAULT_VAR = [
@@ -442,8 +468,29 @@ const ST = {
   editingFixed: null,
   editingVar: null,
   editIncome: false,
+  setPage: null,
   get L(){return T[this.lang];}
 };
+
+// ============ MONTHS ============
+// Each month keeps its own salary, fixed items and budgets, so editing one month never rewrites another.
+// A month without its own copy starts from the latest earlier month (or the old global settings).
+ST.monthCfg=loadObj("bm");
+function cloneCfg(c){return JSON.parse(JSON.stringify({income:c.income,fixedItems:c.fixedItems,varItems:c.varItems}));}
+function cfgFor(k){
+  if(ST.monthCfg[k])return cloneCfg(ST.monthCfg[k]);
+  const prev=Object.keys(ST.monthCfg).filter(m=>m<k).sort().pop();
+  return cloneCfg(prev?ST.monthCfg[prev]:ST.baseCfg);
+}
+function applyMonth(k){const c=cfgFor(k);ST.income=c.income;ST.fixedItems=c.fixedItems;ST.varItems=c.varItems;}
+function initMonths(){
+  ST.baseCfg=cloneCfg(ST);
+  // months recorded before this feature get frozen with the settings they were made with
+  Object.keys(ST.allData).filter(k=>/^\d{4}-\d{2}$/.test(k)&&Array.isArray(ST.allData[k])&&ST.allData[k].length&&!ST.monthCfg[k])
+    .forEach(k=>{ST.monthCfg[k]=cloneCfg(ST.baseCfg);});
+  applyMonth(ST.selectedMonth);
+  saveConfig();
+}
 
 // ============ COMPUTED ============
 function expenses(){return Array.isArray(ST.allData[ST.selectedMonth])?ST.allData[ST.selectedMonth]:[];}
@@ -453,7 +500,7 @@ function totalSpent(){return expenses().reduce((s,e)=>s+(+e.amount||0),0);}
 function remaining(){return totalVarBudget()-totalSpent();}
 function spentCat(id){return expenses().filter(e=>e.catId===id).reduce((s,e)=>s+(+e.amount||0),0);}
 function health(){const inc=ST.income||1;return Math.max(0,Math.min(100,Math.round(((ST.income-totalFixed()-totalSpent())/inc)*100*1.5+55)));}
-function allMonths(){return[...new Set([...Object.keys(ST.allData).filter(k=>Array.isArray(ST.allData[k])&&ST.allData[k].length>0),getMonthKey(now)])].sort((a,b)=>b.localeCompare(a));}
+function allMonths(){return[...new Set([...Object.keys(ST.allData).filter(k=>Array.isArray(ST.allData[k])&&ST.allData[k].length>0),...Object.keys(ST.monthCfg),getMonthKey(now)])].sort((a,b)=>b.localeCompare(a));}
 
 // ============ FORMAT ============
 function fmt(n){
@@ -464,7 +511,11 @@ function money(n){return '<span class="num">'+escHtml(fmt(n))+'</span>';}
 function escHtml(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
 
 // ============ PERSIST ============
-function saveConfig(){lsw("bi",ST.income);lsw("bf",ST.fixedItems);lsw("bv",ST.varItems);}
+function saveConfig(){
+  ST.monthCfg[ST.selectedMonth]=cloneCfg(ST);lsw("bm",ST.monthCfg);
+  // the old global keys follow the current month, as the default for months to come
+  if(ST.selectedMonth===getMonthKey(now)){lsw("bi",ST.income);lsw("bf",ST.fixedItems);lsw("bv",ST.varItems);}
+}
 function saveData(){lsw("bd",ST.allData);}
 
 // ============ TOAST ============
@@ -483,8 +534,12 @@ const C_OK="#2f6f5e", C_ERR="#b4472e";
 // ============ ACTIONS ============
 function setLang(lang){if(!T[lang])return;ST.lang=lang;lsw("bl",lang);updateAll();}
 function setTheme(theme){if(!THEME_NAMES[theme])return;ST.theme=theme;lsw("bt",theme);updateAll();}
-function setTab(i){ST.activeTab=i;ST.showMonthPicker=false;renderMonthPicker();renderTab();updateNav();}
-function setMonth(k){ST.selectedMonth=k;ST.showMonthPicker=false;updateHeader();renderTab();}
+function setTab(i){ST.activeTab=i;if(i!==5)ST.setPage=null;ST.showMonthPicker=false;renderMonthPicker();renderTab();updateNav();}
+function setMonth(k){
+  ST.selectedMonth=k;ST.showMonthPicker=false;applyMonth(k);
+  ST.editingFixed=null;ST.editingVar=null;ST.editIncome=false;ST.reportText="";
+  updateHeader();renderTab();
+}
 function toggleMonthPicker(){ST.showMonthPicker=!ST.showMonthPicker;renderMonthPicker();}
 
 function addExpense(){
@@ -554,6 +609,11 @@ function saveEditVar(id){
   });
   saveConfig();ST.editingVar=null;renderTab(true);toast("✓",C_OK);
 }
+
+// Settings sub-pages: push a history entry so the phone's back gesture returns to the list
+function openSet(page){ST.setPage=page;try{history.pushState({set:page},"");}catch(e){}renderTab();}
+function closeSet(){if(history.state&&history.state.set)history.back();else{ST.setPage=null;renderTab();}}
+window.addEventListener("popstate",()=>{if(ST.setPage){ST.setPage=null;if(ST.activeTab===5)renderTab();}});
 
 // re-render a tab without losing what the user already typed
 function rerenderKeep(){
@@ -685,7 +745,8 @@ function renderMonthPicker(){
   picker.innerHTML=allMonths().filter(monthOk).map(k=>
     '<button type="button" class="month-item'+(k===ST.selectedMonth?" active":"")+'" onclick="setMonth(\''+k+'\')">'+
       '<span>'+escHtml(getMonthLabel(k))+'</span>'+
-      (k===getMonthKey(now)?'<span class="dot-now"></span>':"")+
+      '<span class="row-s" style="gap:8px"><span class="num mi-v">'+escHtml(fmt((ST.allData[k]||[]).reduce((s,e)=>s+(+e.amount||0),0)))+'</span>'+
+      (k===getMonthKey(now)?'<span class="dot-now"></span>':"")+'</span>'+
     '</button>'
   ).join("");
 }
@@ -887,14 +948,16 @@ function renderReport(L){
 
 // ---------- 5 · SETTINGS ----------
 function renderSettings(L){
-  const themeGrid=Object.keys(THEME_NAMES).map(key=>{
-    const txt=key==="light"?"#16241f":"#eef1ef";
-    return '<button type="button" class="opt'+(ST.theme===key?" on":"")+'" onclick="setTheme(\''+key+'\')" style="background:'+THEME_BG[key]+';color:'+txt+'">'+
-      '<div class="sw" style="background:'+THEME_ACCENT[key]+'"></div>'+escHtml((THEME_NAMES[key]||{})[ST.lang]||THEME_NAMES[key].en)+'</button>';
-  }).join("");
-
-  const langGrid=[["ar","العربية","🇸🇦"],["en","English","🇬🇧"],["de","Deutsch","🇩🇪"]].map(a=>
-    '<button type="button" class="opt'+(ST.lang===a[0]?" on":"")+'" onclick="setLang(\''+a[0]+'\')"><div class="fl">'+a[2]+'</div>'+a[1]+'</button>').join("");
+  const LANGS=[["ar","العربية","🇸🇦"],["en","English","🇬🇧"],["de","Deutsch","🇩🇪"]];
+  const themeName=k=>(THEME_NAMES[k]||{})[ST.lang]||THEME_NAMES[k].en;
+  const check=on=>on?'<span class="srow-ck" aria-hidden="true">✓</span>':"";
+  const row=(icon,label,value,page)=>'<button type="button" class="srow" onclick="openSet(\''+page+'\')">'+
+    '<span class="srow-ic">'+icon+'</span><span class="srow-l">'+escHtml(label)+'</span><span class="srow-v">'+value+'</span><span class="chev" aria-hidden="true">›</span></button>';
+  const themeRows=keys=>keys.map(k=>'<button type="button" class="srow" onclick="setTheme(\''+k+'\')"'+(ST.theme===k?' aria-current="true"':"")+'>'+
+    '<span class="th-sw" style="background:'+THEME_BG[k]+'"><i style="background:'+THEME_ACCENT[k]+'"></i></span>'+
+    '<span class="srow-l">'+escHtml(themeName(k))+'</span>'+check(ST.theme===k)+'</button>').join("");
+  const langRows=LANGS.map(a=>'<button type="button" class="srow" onclick="setLang(\''+a[0]+'\')"'+(ST.lang===a[0]?' aria-current="true"':"")+'>'+
+    '<span class="srow-ic">'+a[2]+'</span><span class="srow-l">'+a[1]+'</span>'+check(ST.lang===a[0])+'</button>').join("");
 
   const iconPick=(sel,fn)=>ICONS.map(ic=>'<button type="button" class="pick-i'+(sel===ic?" on":"")+'" onclick="'+fn(ic)+'">'+ic+'</button>').join("");
   const colorPick=(sel,fn)=>COLORS.map(c=>'<button type="button" class="pick-c'+(sel===c?" on":"")+'" style="background:'+c+'" onclick="'+fn(c)+'" aria-label="'+c+'"></button>').join("");
@@ -933,27 +996,49 @@ function renderSettings(L){
       '<button type="button" class="btn btn-ok" onclick="saveIncome()">'+escHtml(L.save)+'</button></div>'
     :'<p class="num up" style="font-size:26px;font-weight:500;margin:8px 0 0">'+escHtml(fmt(ST.income))+'</p>';
 
-  return pageTitle(L,5)+
-  '<div class="card"><p class="sec">'+escHtml(L.language)+'</p><div class="grid3">'+langGrid+'</div></div>'+
-  '<div class="card"><p class="sec">'+escHtml(L.theme)+'</p><div class="grid4">'+themeGrid+'</div></div>'+
-  '<div class="card"><div class="row-b"><p class="sec" style="margin:0">'+escHtml(L.monthlySalary)+'</p>'+
-    '<button type="button" class="btn btn-sm" onclick="toggleEditIncome()">'+escHtml(ST.editIncome?L.cancel:L.edit)+'</button></div>'+incomeSection+'</div>'+
-  '<div class="card"><p class="sec">'+escHtml(L.fixedCats)+'</p>'+fixedRows+
+  const monthNote='<p class="note" style="margin:0 6px 14px">'+escHtml(L.monthNote.replace("{m}",getMonthLabel(ST.selectedMonth)))+'</p>';
+  const sub=(title,html,withNote)=>'<button type="button" class="back" onclick="closeSet()"><span class="chev" aria-hidden="true">›</span>'+escHtml(L.tabs[5])+'</button>'+
+    '<div class="page-title"><div><h2>'+escHtml(title)+'</h2>'+(withNote?'<p class="sub">'+escHtml(getMonthLabel(ST.selectedMonth))+'</p>':"")+'</div></div>'+(withNote?monthNote:"")+html;
+  const pg=ST.setPage;
+
+  if(pg==="lang")return sub(L.language,'<div class="sgrp">'+langRows+'</div>');
+  if(pg==="theme")return sub(L.theme,
+    '<p class="sgrp-t">'+escHtml(L.lightThemes)+'</p><div class="sgrp">'+themeRows(LIGHT_THEMES)+'</div>'+
+    '<p class="sgrp-t">'+escHtml(L.darkThemes)+'</p><div class="sgrp">'+themeRows(Object.keys(THEME_NAMES).filter(k=>!LIGHT_THEMES.includes(k)))+'</div>');
+  if(pg==="salary")return sub(L.monthlySalary,'<div class="card"><div class="row-b"><p class="sec" style="margin:0">'+escHtml(L.monthlySalary)+'</p>'+
+    '<button type="button" class="btn btn-sm" onclick="toggleEditIncome()">'+escHtml(ST.editIncome?L.cancel:L.edit)+'</button></div>'+incomeSection+'</div>',true);
+  if(pg==="fixed")return sub(L.fixedCats,'<div class="card">'+fixedRows+
     '<div class="add-box"><label class="lbl" for="inp-fn">'+escHtml(L.addFixed)+'</label><div class="row-s">'+
       '<input id="inp-fn" class="inp" style="flex:2" placeholder="'+escHtml(L.namePh)+'">'+
       '<input id="inp-fa" class="inp" type="number" step="0.01" inputmode="decimal" style="flex:1" placeholder="€">'+
-      '<button type="button" class="btn btn-solid" onclick="addFixed()">'+escHtml(L.add)+'</button></div></div></div>'+
-  '<div class="card"><p class="sec">'+escHtml(L.varCats)+'</p>'+varRows+
+      '<button type="button" class="btn btn-solid" onclick="addFixed()">'+escHtml(L.add)+'</button></div></div></div>',true);
+  if(pg==="var")return sub(L.varCats,'<div class="card">'+varRows+
     '<div class="add-box"><label class="lbl" for="inp-vn">'+escHtml(L.addVar)+'</label><div class="row-s" style="margin-bottom:12px">'+
       '<input id="inp-vn" class="inp" style="flex:2" placeholder="'+escHtml(L.namePh)+'">'+
       '<input id="inp-vb" class="inp" type="number" step="0.01" inputmode="decimal" style="flex:1" placeholder="€"></div>'+
       '<div class="picker" style="margin-bottom:12px">'+iconPick(ST.newVarIcon,ic=>"selectIcon('"+ic+"')")+'</div>'+
       '<div class="picker" style="margin-bottom:14px">'+colorPick(ST.newVarColor,c=>"selectColor('"+c+"')")+'</div>'+
-      '<button type="button" class="btn btn-solid btn-full" onclick="addVar()">'+escHtml(L.addVar)+'</button></div></div>';
+      '<button type="button" class="btn btn-solid btn-full" onclick="addVar()">'+escHtml(L.addVar)+'</button></div></div>',true);
+
+  const langName=(LANGS.find(a=>a[0]===ST.lang)||LANGS[0])[1];
+  return pageTitle(L,5)+
+  '<p class="sgrp-t">'+escHtml(L.general)+'</p><div class="sgrp">'+
+    row("🌐",L.language,escHtml(langName),"lang")+
+    row("🎨",L.theme,escHtml(themeName(ST.theme)),"theme")+
+  '</div>'+
+  '<p class="sgrp-t">'+escHtml(L.budgetFor+" · "+getMonthLabel(ST.selectedMonth))+'</p><div class="sgrp">'+
+    row("💶",L.monthlySalary,money(ST.income),"salary")+
+    row("📌",L.fixedCats,escHtml(ST.fixedItems.length+" "+L.itemsN)+" · "+money(totalFixed()),"fixed")+
+    row("🗂️",L.varCats,escHtml(ST.varItems.length+" "+L.catsN)+" · "+money(totalVarBudget()),"var")+
+  '</div>'+
+  '<p class="sgrp-t">'+escHtml(L.appSec)+'</p><div class="sgrp">'+
+    '<div class="srow"><span class="srow-ic">ⓘ</span><span class="srow-l">BudgetPro</span><span class="srow-v">'+escHtml(L.version)+' 2.0</span></div>'+
+  '</div>';
 }
 
 // ============ INIT ============
 function init(){
+  initMonths();
   const pill=document.getElementById("salary-pill");
   pill.addEventListener("click",()=>setTab(5));
   pill.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setTab(5);}});
