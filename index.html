@@ -9,6 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#f5f3ee" id="meta-theme">
 <title>BudgetPro</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -161,6 +164,7 @@ h2{font-size:15px;font-weight:600;margin:0 0 12px}
   padding:11px 16px;font-size:15px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:8px;
 }
 .btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .btn-solid{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
 .btn-ok{background:var(--plus);color:var(--paper);border-color:var(--plus)}
 .btn-del{color:var(--minus);border-color:var(--line)}
@@ -295,6 +299,7 @@ const T = {
     gmail:"تقرير Gmail",gmailDesc:"مسودة جاهزة",
     send:"إرسال",sending:"...",ok:"✓ تم",err:"✗ خطأ",
     gmailDone:"✓ المسودة جاهزة في Gmail!",gmailFail:"حدث خطأ",
+    aiOff:"ميزات الذكاء الاصطناعي (التحليل الذكي وتقرير Gmail) تعمل فقط عند فتح التطبيق داخل Claude. باقي الميزات تعمل بالكامل على الهاتف، ويمكنك تصدير التقرير PDF أو Excel.",
     monthlySalary:"الراتب الشهري",fixedCats:"المصاريف الثابتة",varCats:"فئات الإنفاق",
     addFixed:"إضافة بند ثابت",addVar:"إضافة فئة",namePh:"الاسم",
     exportExcel:"تصدير Excel",exportDATEV:"تصدير DATEV",
@@ -324,6 +329,7 @@ const T = {
     gmail:"Gmail Report",gmailDesc:"Ready draft",
     send:"Send",sending:"...",ok:"✓ Done",err:"✗ Error",
     gmailDone:"✓ Draft ready in Gmail!",gmailFail:"Error. Try again.",
+    aiOff:"AI features (AI Analysis and Gmail Report) only work when the app is opened inside Claude. Everything else works fully on your phone, and you can still export the report as PDF or Excel.",
     monthlySalary:"Monthly Salary",fixedCats:"Fixed Expenses",varCats:"Variable Categories",
     addFixed:"Add Fixed Item",addVar:"Add Category",namePh:"Name",
     exportExcel:"Export Excel",exportDATEV:"Export DATEV",
@@ -353,6 +359,7 @@ const T = {
     gmail:"Gmail Bericht",gmailDesc:"Entwurf bereit",
     send:"Senden",sending:"...",ok:"✓ Fertig",err:"✗ Fehler",
     gmailDone:"✓ Entwurf in Gmail bereit!",gmailFail:"Fehler. Erneut versuchen.",
+    aiOff:"KI-Funktionen (KI-Analyse und Gmail Bericht) funktionieren nur, wenn die App in Claude geöffnet wird. Alles andere funktioniert vollständig auf dem Handy, und der Bericht lässt sich weiterhin als PDF oder Excel exportieren.",
     monthlySalary:"Monatsgehalt",fixedCats:"Fixkosten",varCats:"Variable Kategorien",
     addFixed:"Fixkosten hinzufügen",addVar:"Kategorie hinzufügen",namePh:"Name",
     exportExcel:"Excel exportieren",exportDATEV:"DATEV exportieren",
@@ -565,7 +572,11 @@ function startEditVar(id){ST.editingVar=id;rerenderKeep();}
 function cancelEditVar(){ST.editingVar=null;rerenderKeep();}
 function toggleEditIncome(){ST.editIncome=!ST.editIncome;rerenderKeep();}
 
+// The AI calls go through Claude's sandbox proxy, so they only work when the page runs inside Claude.
+const AI_ON=/(^|\.)(claude\.ai|claudeusercontent\.com)$/.test(location.hostname);
+
 async function generateReport(){
+  if(!AI_ON)return;
   ST.reportLoading=true;ST.reportText="";renderTab(true);
   const L=ST.L;
   const rows=ST.varItems.map(v=>getCatName(v)+": "+v.budget+"€/"+spentCat(v.id).toFixed(2)+"€").join(", ");
@@ -578,6 +589,7 @@ async function generateReport(){
 }
 
 async function sendGmail(){
+  if(!AI_ON)return;
   ST.gmailStatus="loading";renderTab(true);
   const L=ST.L;
   const body="BudgetPro — "+getMonthLabel(ST.selectedMonth)+"\n\n"+L.salary+": "+ST.income+"€ | "+L.fixed+": "+totalFixed()+"€ | "+L.spent+": "+totalSpent().toFixed(2)+"€ | "+L.remaining+": "+remaining().toFixed(2)+"€\n\n"+
@@ -843,6 +855,7 @@ function renderAccounting(L){
 function renderReport(L){
   const gs=ST.gmailStatus;
   const gmailLabel=gs==="loading"?L.sending:gs==="success"?L.ok:gs==="error"?L.err:L.send;
+  const aiOff=AI_ON?"":'<p class="note" style="margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--card2);border:1px dashed var(--line)">ⓘ '+escHtml(L.aiOff)+'</p>';
   const analysis=ST.reportLoading
     ?'<div class="empty" style="padding:28px"><p style="margin:0">'+escHtml(L.analyzing)+'</p></div>'
     :!ST.reportText
@@ -857,18 +870,18 @@ function renderReport(L){
       '<td style="font-size:12px">'+escHtml(r>=0?L.within:L.exceeded)+'</td></tr>';
   }).join("");
   return pageTitle(L,4,
-    '<div class="row-s no-print"><button type="button" class="btn btn-sm" onclick="generateReport()">'+escHtml(L.refresh)+'</button>'+
+    '<div class="row-s no-print">'+(AI_ON?'<button type="button" class="btn btn-sm" onclick="generateReport()">'+escHtml(L.refresh)+'</button>':"")+
     '<button type="button" class="btn btn-solid btn-sm" onclick="window.print()">'+escHtml(L.pdf)+'</button></div>')+
   '<div class="card no-print"><div class="row-b"><div><p style="margin:0;font-size:15px;font-weight:500">'+escHtml(L.gmail)+'</p><p class="sub">'+escHtml(L.gmailDesc)+'</p></div>'+
-    '<button type="button" class="btn btn-sm" onclick="sendGmail()"'+(gs==="loading"?" disabled":"")+'>'+escHtml(gmailLabel)+'</button></div>'+
+    '<button type="button" class="btn btn-sm" onclick="sendGmail()"'+(gs==="loading"||!AI_ON?" disabled":"")+'>'+escHtml(gmailLabel)+'</button></div>'+
     (gs==="success"?'<p class="note up" style="margin-top:10px">'+escHtml(L.gmailDone)+'</p>':"")+
-    (gs==="error"?'<p class="note down" style="margin-top:10px">'+escHtml(L.gmailFail)+'</p>':"")+
+    (gs==="error"?'<p class="note down" style="margin-top:10px">'+escHtml(L.gmailFail)+'</p>':"")+aiOff+
   '</div>'+
   '<div class="card"><p class="sec">'+escHtml(L.summary)+'</p><div class="grid2" style="margin-bottom:18px">'+sum+'</div>'+
     '<p class="sec">'+escHtml(L.details)+'</p><div class="tbl-wrap" style="margin-bottom:18px"><table class="tbl"><thead><tr>'+
       '<th>'+escHtml(L.catLabel)+'</th><th>'+escHtml(L.budget)+'</th><th>'+escHtml(L.spent)+'</th><th>'+escHtml(L.remaining)+'</th><th>'+escHtml(L.status)+'</th>'+
     '</tr></thead><tbody>'+detail+'</tbody></table></div>'+
-    '<p class="sec">'+escHtml(L.analysis)+'</p>'+analysis+
+    (AI_ON?'<p class="sec">'+escHtml(L.analysis)+'</p>'+analysis:"")+
   '</div>';
 }
 
@@ -951,6 +964,10 @@ function init(){
 }
 
 init();
+
+if("serviceWorker" in navigator&&location.protocol==="https:"&&!AI_ON){
+  window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});
+}
 </script>
 </body>
 </html>
