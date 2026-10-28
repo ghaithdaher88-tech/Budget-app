@@ -23,7 +23,7 @@
   --paper:#f5f3ee; --card:#ffffff; --card2:#f0ede6; --line:#e2ded4;
   --ring:#2f6f5e; --track:#e2ded4; --plus:#2f6f5e; --minus:#b4472e; --warn:#a06f0e;
   --on-ink:#f5f3ee; --scrim:rgba(10,20,17,.45);
-  --radius:14px;
+  --radius:20px;
   --sans:"Rubik",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"Rubik",system-ui,-apple-system,"Segoe UI",sans-serif;
   --ring2:var(--ring); --grad:none; --glass:rgba(255,255,255,.72);
@@ -114,9 +114,9 @@ button{cursor:pointer}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 h2{font-size:15px;font-weight:600;margin:0 0 12px}
 .page-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px}
-.page-title h2{margin:0;font-size:17px}
+.page-title h2{margin:0;font-size:24px;font-weight:600;letter-spacing:-.3px}
 .sub{font-size:12px;color:var(--ink-faint);margin:0}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px}
 .card.tint{background:var(--card2)}
 .sec{font-size:13px;font-weight:600;color:var(--ink-soft);margin:0 0 12px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -213,7 +213,7 @@ h2{font-size:15px;font-weight:600;margin:0 0 12px}
 
 /* ---- buttons & inputs ---- */
 .btn{
-  border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;
+  border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:14px;
   padding:11px 16px;font-size:15px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:8px;
 }
 .btn:active{transform:scale(.97)}
@@ -221,20 +221,55 @@ h2{font-size:15px;font-weight:600;margin:0 0 12px}
 .btn-solid{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
 .btn-ok{background:var(--plus);color:var(--paper);border-color:var(--plus)}
 .btn-del{color:var(--minus);border-color:var(--line)}
-.btn-sm{padding:7px 12px;font-size:13px;border-radius:9px}
+.btn-sm{padding:8px 14px;font-size:13px;border-radius:999px}
+.btn-pri{background:var(--ring);border-color:var(--ring);color:#fff}
+.btn-lg{padding:15px 18px;font-size:17px;border-radius:16px}
 .btn-full{width:100%}
 .btn-col{flex-direction:column;gap:4px;padding:16px;border-radius:var(--radius);width:100%;background:var(--card)}
 .btn-col svg{width:24px;height:24px}
 label.lbl{display:block;font-size:13px;color:var(--ink-soft);margin:0 0 6px}
 .inp{
-  width:100%;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;
-  background:var(--paper);color:var(--ink);margin:0;min-width:0;
+  width:100%;font-size:16px;padding:13px 15px;border:1px solid var(--line);border-radius:14px;
+  background:var(--card2);color:var(--ink);margin:0;min-width:0;
 }
 .inp:focus{border-color:var(--ring);outline:0}
 select.inp{appearance:auto}
 .fld{margin-bottom:14px}
 .chip-btn{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:999px;padding:6px 12px;font-size:13px}
 .empty{text-align:center;padding:40px 16px}
+.empty .ico{width:40px;height:40px;color:var(--ring);stroke-width:1.4;margin-bottom:10px}
+.icard.mini{min-height:0;padding:14px 16px}
+.icard.mini .iv{font-size:22px}
+.cico{width:40px;height:40px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:19px;flex:none}
+.xbtn{border:0;background:none;color:var(--ink-faint);padding:6px;border-radius:10px;display:inline-flex;flex:none}
+.xbtn .ico{width:18px;height:18px}
+.xbtn:active{color:var(--minus);background:var(--card2)}
+.dayh{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--ink-soft);margin:20px 6px 8px;font-weight:500}
+.card.list{padding:2px 16px}
+.pill2{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--card2);white-space:nowrap;font-weight:500}
+.pill2.ok{color:var(--plus)} .pill2.bad{color:var(--minus)}
+.acct{display:inline-flex;gap:6px;margin-top:4px;font-size:12px;color:var(--ink-soft)}
+.acct b{font-weight:500}
+.icard.mini .row-b{gap:8px}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:0 -20px 6px;padding:2px 20px 6px;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-size:14px;color:var(--ink)}
+.chip.on{background:var(--ring);border-color:var(--ring);color:#fff}
+
+/* ---- add sheet ---- */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:90;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;inset-inline:0;bottom:0;z-index:95;max-width:520px;margin:0 auto;background:var(--card);border-radius:28px 28px 0 0;
+  padding:10px 20px calc(20px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .32s cubic-bezier(.22,.9,.3,1);
+  max-height:92vh;overflow:auto;box-shadow:0 -10px 40px rgba(0,0,0,.18);visibility:hidden}
+.sheet.on{transform:none;visibility:visible}
+.sheet .chips{margin:0 -20px 14px}
+.sheet .chip{background:var(--card2)}
+.sheet .chip.on{background:var(--ring)}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 10px}
+.amt{display:flex;align-items:center;justify-content:center;gap:4px;margin:8px 0 18px;direction:ltr}
+.amt input{font-size:52px;font-weight:600;width:1.6ch;max-width:80%;text-align:center;border:0;background:none;outline:0;color:var(--ink);font-family:var(--sans);padding:0;letter-spacing:-1px}
+.amt span{font-size:34px;color:var(--ink-faint);font-weight:500}
 .empty p{color:var(--ink-soft);margin:0 0 16px}
 
 /* ---- settings ---- */
@@ -341,7 +376,9 @@ select.inp{appearance:auto}
   <div id="tab-content"></div>
 </main>
 
-<button type="button" class="fab" id="fab" onclick="setTab(1)"></button>
+<button type="button" class="fab" id="fab" onclick="openAdd()"></button>
+<div class="scrim" id="scrim" onclick="closeAdd()"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div>
 
 <nav id="bottom-nav" aria-label="Navigation">
   <div class="nav-in" id="nav-row"></div>
@@ -367,7 +404,7 @@ const T = {
     gmailDone:"✓ المسودة جاهزة في Gmail!",gmailFail:"حدث خطأ",
     leftToSpend:"متبقٍ للإنفاق",daysLeft:"باقي {n} يوم",dayLeft:"اليوم الأخير",closedMonth:"شهر منتهٍ — للمراجعة",upcoming:"شهر قادم",insights:"تحليلات",
     trend:"الاتجاه",trendDown:"إنفاق أقل",trendUp:"إنفاق أعلى",trendSame:"مستقر",noCompare:"لا مقارنة بعد",topSpending:"الأعلى إنفاقاً",noSpend:"لا مصاريف",planned:"الثابت",savings:"الادخار",saved:"مدّخر",catBudgets:"ميزانيات الفئات",
-    general:"عام",budgetFor:"ميزانية",back:"رجوع",lightThemes:"ثيمات فاتحة",darkThemes:"ثيمات داكنة",itemsN:"بنود",catsN:"فئات",appSec:"التطبيق",version:"الإصدار",
+    all:"الكل",confirmDel:"حذف هذا المصروف؟",addedTo:"أُضيف إلى {m}",close:"إغلاق",entries:"القيود",exportSub:"ملف للتنزيل",general:"عام",budgetFor:"ميزانية",back:"رجوع",lightThemes:"ثيمات فاتحة",darkThemes:"ثيمات داكنة",itemsN:"بنود",catsN:"فئات",appSec:"التطبيق",version:"الإصدار",
     monthNote:"هذه الإعدادات خاصة بشهر {m} فقط. الأشهر السابقة تحتفظ بأرقامها، وكل شهر جديد يبدأ بنسخة من إعدادات آخر شهر.",
     aiOff:"ميزات الذكاء الاصطناعي (التحليل الذكي وتقرير Gmail) تعمل فقط عند فتح التطبيق داخل Claude. باقي الميزات تعمل بالكامل على الهاتف، ويمكنك تصدير التقرير PDF أو Excel.",
     monthlySalary:"الراتب الشهري",fixedCats:"المصاريف الثابتة",varCats:"فئات الإنفاق",
@@ -401,7 +438,7 @@ const T = {
     gmailDone:"✓ Draft ready in Gmail!",gmailFail:"Error. Try again.",
     leftToSpend:"left to spend",daysLeft:"{n} days remaining",dayLeft:"Last day",closedMonth:"Closed month — review",upcoming:"Upcoming month",insights:"Insights",
     trend:"Trend",trendDown:"Decreasing",trendUp:"Increasing",trendSame:"Stable",noCompare:"No comparison yet",topSpending:"Top Spending",noSpend:"No spending",planned:"Planned",savings:"Savings",saved:"saved",catBudgets:"Category budgets",
-    general:"General",budgetFor:"Budget",back:"Back",lightThemes:"Light themes",darkThemes:"Dark themes",itemsN:"items",catsN:"categories",appSec:"App",version:"Version",
+    all:"All",confirmDel:"Delete this expense?",addedTo:"Added to {m}",close:"Close",entries:"entries",exportSub:"Download file",general:"General",budgetFor:"Budget",back:"Back",lightThemes:"Light themes",darkThemes:"Dark themes",itemsN:"items",catsN:"categories",appSec:"App",version:"Version",
     monthNote:"These settings apply to {m} only. Past months keep their own numbers, and each new month starts with a copy of the latest month.",
     aiOff:"AI features (AI Analysis and Gmail Report) only work when the app is opened inside Claude. Everything else works fully on your phone, and you can still export the report as PDF or Excel.",
     monthlySalary:"Monthly Salary",fixedCats:"Fixed Expenses",varCats:"Variable Categories",
@@ -435,7 +472,7 @@ const T = {
     gmailDone:"✓ Entwurf in Gmail bereit!",gmailFail:"Fehler. Erneut versuchen.",
     leftToSpend:"verfügbar",daysLeft:"noch {n} Tage",dayLeft:"Letzter Tag",closedMonth:"Abgeschlossen — Rückblick",upcoming:"Kommender Monat",insights:"Insights",
     trend:"Trend",trendDown:"Sinkend",trendUp:"Steigend",trendSame:"Stabil",noCompare:"Noch kein Vergleich",topSpending:"Top-Ausgaben",noSpend:"Keine Ausgaben",planned:"Geplant",savings:"Sparen",saved:"gespart",catBudgets:"Kategoriebudgets",
-    general:"Allgemein",budgetFor:"Budget",back:"Zurück",lightThemes:"Helle Themes",darkThemes:"Dunkle Themes",itemsN:"Posten",catsN:"Kategorien",appSec:"App",version:"Version",
+    all:"Alle",confirmDel:"Diese Ausgabe löschen?",addedTo:"Zu {m} hinzugefügt",close:"Schließen",entries:"Buchungen",exportSub:"Datei herunterladen",general:"Allgemein",budgetFor:"Budget",back:"Zurück",lightThemes:"Helle Themes",darkThemes:"Dunkle Themes",itemsN:"Posten",catsN:"Kategorien",appSec:"App",version:"Version",
     monthNote:"Diese Einstellungen gelten nur für {m}. Frühere Monate behalten ihre Zahlen, und jeder neue Monat startet mit einer Kopie des letzten Monats.",
     aiOff:"KI-Funktionen (KI-Analyse und Gmail Bericht) funktionieren nur, wenn die App in Claude geöffnet wird. Alles andere funktioniert vollständig auf dem Handy, und der Bericht lässt sich weiterhin als PDF oder Excel exportieren.",
     monthlySalary:"Monatsgehalt",fixedCats:"Fixkosten",varCats:"Variable Kategorien",
@@ -591,7 +628,7 @@ const C_OK="#2f6f5e", C_ERR="#b4472e";
 // ============ ACTIONS ============
 function setLang(lang){if(!T[lang])return;ST.lang=lang;lsw("bl",lang);updateAll();}
 function setTheme(theme){if(!THEME_NAMES[theme])return;ST.theme=theme;lsw("bt",theme);updateAll();}
-function setTab(i){ST.activeTab=i;if(i!==5)ST.setPage=null;ST.showMonthPicker=false;renderMonthPicker();renderTab();updateNav();}
+function setTab(i){if(i===1){openAdd();return;}ST.activeTab=i;if(i!==5)ST.setPage=null;ST.showMonthPicker=false;renderMonthPicker();renderTab();updateNav();}
 function setMonth(k){
   ST.selectedMonth=k;ST.showMonthPicker=false;applyMonth(k);
   ST.editingFixed=null;ST.editingVar=null;ST.editIncome=false;ST.reportText="";
@@ -603,21 +640,64 @@ function addExpense(){
   const L=ST.L;
   const desc=(document.getElementById("inp-desc")||{}).value;
   const amount=parseFloat(String((document.getElementById("inp-amount")||{}).value||"").replace(",","."));
-  const catId=parseInt((document.getElementById("inp-cat")||{}).value,10);
   const date=(document.getElementById("inp-date")||{}).value||localDate(new Date());
-  if(!desc||!desc.trim()){toast("⚠ "+L.descLabel,C_ERR);return;}
   if(!amount||amount<=0){toast("⚠ "+L.amountLabel,C_ERR);return;}
-  const cat=ST.varItems.find(v=>v.id===catId)||ST.varItems[0];
+  if(!desc||!desc.trim()){toast("⚠ "+L.descLabel,C_ERR);return;}
+  const cat=ST.varItems.find(v=>v.id===ST.addCat)||ST.varItems[0];
   if(!cat){toast("⚠ "+L.catLabel,C_ERR);return;}
+  // file the expense under the month of its date, so a back-dated entry lands in the right month
+  const mk=/^\d{4}-\d{2}/.test(date)?date.slice(0,7):ST.selectedMonth;
   const entry={id:Date.now(),desc:desc.trim(),amount,catId:cat.id,catKey:cat.key||"custom",date};
-  if(!Array.isArray(ST.allData[ST.selectedMonth]))ST.allData[ST.selectedMonth]=[];
-  ST.allData[ST.selectedMonth].unshift(entry);
+  if(!Array.isArray(ST.allData[mk]))ST.allData[mk]=[];
+  ST.allData[mk].unshift(entry);
   saveData();
-  toast("✓ "+L.addExpense,C_OK);
-  setTab(0);
+  closeAdd();
+  toast("✓ "+(mk===ST.selectedMonth?L.addExpense:L.addedTo.replace("{m}",getMonthLabel(mk))),C_OK);
+  updateHeader();renderTab(true);
 }
 
+// Add sheet: slides up over the current page; the back gesture closes it
+function defaultDate(){const cur=getMonthKey(new Date());const k=ST.selectedMonth;
+  return k===cur?localDate(new Date()):k+"-"+pad2(k<cur?daysInMonth(k):1);}
+function renderSheet(){
+  const L=ST.L;
+  const chips=ST.varItems.map(v=>'<button type="button" class="chip'+(v.id===ST.addCat?" on":"")+'" data-cat="'+nid(v.id)+'" onclick="pickCat('+nid(v.id)+')">'+
+    '<span>'+escHtml(v.icon)+'</span>'+escHtml(getCatName(v))+'</button>').join("");
+  document.getElementById("sheet").innerHTML='<div class="grab"></div>'+
+    '<div class="row-b"><h2 id="sheet-title" style="margin:0;font-size:19px">'+escHtml(L.addExpense)+'</h2>'+
+      '<button type="button" class="xbtn" onclick="closeAdd()" aria-label="'+escHtml(L.close)+'"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'+
+    '<label class="amt"><input id="inp-amount" type="number" inputmode="decimal" placeholder="0" step="0.01" min="0" oninput="fitAmt(this)" aria-label="'+escHtml(L.amountLabel)+'"><span>€</span></label>'+
+    '<div class="fld"><label class="lbl" for="inp-desc">'+escHtml(L.descLabel)+'</label>'+
+      '<input id="inp-desc" class="inp" type="text" placeholder="'+escHtml(L.descPh)+'" autocomplete="off" autocorrect="off" spellcheck="false"></div>'+
+    '<p class="lbl">'+escHtml(L.catLabel)+'</p><div class="chips">'+chips+'</div>'+
+    '<div class="fld" style="margin-bottom:20px"><label class="lbl" for="inp-date">'+escHtml(L.dateLabel)+'</label>'+
+      '<input id="inp-date" class="inp" type="date" value="'+defaultDate()+'"></div>'+
+    '<button type="button" class="btn btn-pri btn-full btn-lg" onclick="addExpense()">'+escHtml(L.save)+'</button>';
+}
+// size the amount field to its text so the € sign sits right next to the number
+function fitAmt(el){const c=fitAmt.c||(fitAmt.c=document.createElement("canvas").getContext("2d"));
+  const cs=getComputedStyle(el);c.font=cs.fontWeight+" "+cs.fontSize+" "+cs.fontFamily;
+  el.style.width=Math.ceil(c.measureText(el.value||el.placeholder).width+14)+"px";}
+function pickCat(id){ST.addCat=id;document.querySelectorAll("#sheet .chip").forEach(c=>c.classList.toggle("on",+c.getAttribute("data-cat")===id));}
+function openAdd(){
+  if(!ST.varItems.find(v=>v.id===ST.addCat))ST.addCat=(ST.varItems[0]||{}).id;
+  ST.addOpen=true;renderSheet();
+  document.getElementById("sheet").classList.add("on");document.getElementById("scrim").classList.add("on");
+  try{history.pushState({add:1},"");}catch(e){}
+  const a=document.getElementById("inp-amount");fitAmt(a);
+  setTimeout(()=>a.focus(),320);
+}
+function closeAdd(fromPop){
+  if(!ST.addOpen)return;
+  ST.addOpen=false;
+  document.getElementById("sheet").classList.remove("on");document.getElementById("scrim").classList.remove("on");
+  if(!fromPop&&history.state&&history.state.add)history.back();
+}
+window.addEventListener("popstate",()=>{if(ST.addOpen)closeAdd(true);});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAdd();});
+
 function deleteExpense(id){
+  if(!confirm(ST.L.confirmDel))return;
   ST.allData[ST.selectedMonth]=expenses().filter(e=>e.id!==id);
   saveData();
   renderTab(true);
@@ -953,42 +1033,46 @@ function renderDashboard(L){
     '<div class="card catl">'+catRows+'</div>';
 }
 
-// ---------- 1 · ADD ----------
-function renderAdd(L){
-  const catOptions=ST.varItems.map(v=>'<option value="'+nid(v.id)+'">'+escHtml(v.icon)+' '+escHtml(getCatName(v))+'</option>').join("");
-  return pageTitle(L,1,'<button type="button" class="btn btn-sm" onclick="setTab(0)">'+escHtml(L.cancel)+'</button>')+
-  '<div class="card">'+
-    '<div class="fld"><label class="lbl" for="inp-desc">'+escHtml(L.descLabel)+'</label>'+
-      '<input id="inp-desc" class="inp" type="text" placeholder="'+escHtml(L.descPh)+'" autocomplete="off" autocorrect="off" spellcheck="false"></div>'+
-    '<div class="fld"><label class="lbl" for="inp-amount">'+escHtml(L.amountLabel)+'</label>'+
-      '<input id="inp-amount" class="inp" type="number" inputmode="decimal" placeholder="0.00" step="0.01" min="0"></div>'+
-    '<div class="fld"><label class="lbl" for="inp-cat">'+escHtml(L.catLabel)+'</label>'+
-      '<select id="inp-cat" class="inp">'+catOptions+'</select></div>'+
-    '<div class="fld" style="margin-bottom:20px"><label class="lbl" for="inp-date">'+escHtml(L.dateLabel)+'</label>'+
-      '<input id="inp-date" class="inp" type="date" value="'+localDate(new Date())+'"></div>'+
-    '<button type="button" class="btn btn-solid btn-full" onclick="addExpense()">'+escHtml(L.addExpense)+'</button>'+
-  '</div>';
+// ---------- 1 · ADD (now a sheet, see openAdd) ----------
+function renderAdd(L){return renderDashboard(L);}
+
+function tint(c){return safeColor(c).length===7?safeColor(c)+"26":"var(--card2)";}
+function dayLabel(d){
+  try{const loc=ST.lang==="ar"?"ar-u-nu-latn":ST.lang==="de"?"de-DE":"en-US";
+    return new Date(d+"T12:00:00").toLocaleDateString(loc,{weekday:"long",day:"numeric",month:"long"});}catch(e){return d;}
 }
+const TRASH='<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
 
 // ---------- 2 · HISTORY ----------
+function setHistCat(id){ST.histCat=id;renderTab(true);}
 function renderHistory(L){
-  const exps=expenses();
-  if(!exps.length)return pageTitle(L,2)+
-    '<div class="card empty"><p>'+escHtml(L.noExpenses)+'</p>'+
-    '<button type="button" class="btn btn-solid" onclick="setTab(1)">'+escHtml(L.addFirst)+'</button></div>';
+  const all=expenses();
+  if(!all.length)return pageTitle(L,2)+
+    '<div class="card empty">'+ico("cal")+'<p>'+escHtml(L.noExpenses)+'</p>'+
+    '<button type="button" class="btn btn-pri" onclick="openAdd()">'+escHtml(L.addFirst)+'</button></div>';
+  if(ST.histCat&&!all.some(e=>e.catId===ST.histCat))ST.histCat=null;
+  const exps=ST.histCat?all.filter(e=>e.catId===ST.histCat):all;
+  const sum=exps.reduce((s,e)=>s+(+e.amount||0),0);
+  const used=ST.varItems.filter(v=>all.some(e=>e.catId===v.id));
+  const chips='<div class="chips"><button type="button" class="chip'+(ST.histCat?"":" on")+'" onclick="setHistCat(null)">'+escHtml(L.all)+'</button>'+
+    used.map(v=>'<button type="button" class="chip'+(ST.histCat===v.id?" on":"")+'" onclick="setHistCat('+nid(v.id)+')"><span>'+escHtml(v.icon)+'</span>'+escHtml(getCatName(v))+'</button>').join("")+'</div>';
 
   const grouped={};
   exps.forEach(e=>{const d=String(e.date||"");(grouped[d]=grouped[d]||[]).push(e);});
-  let html=pageTitle(L,2,'<span class="chip-btn num" style="cursor:default">'+exps.length+' '+escHtml(L.ops)+' · '+escHtml(fmt(totalSpent()))+'</span>');
+  let html=pageTitle(L,2)+
+    '<div class="ins" style="margin-bottom:16px">'+
+      '<div class="icard mini c2"><p class="ih">'+ico("pie")+escHtml(L.spent)+'</p><p class="iv num">'+escHtml(fmt(sum))+'</p></div>'+
+      '<div class="icard mini c4"><p class="ih">'+ico("cal")+escHtml(L.ops)+'</p><p class="iv num">'+exps.length+'</p></div>'+
+    '</div>'+chips;
   Object.keys(grouped).sort((a,b)=>b.localeCompare(a)).forEach(date=>{
-    html+='<p class="day num">'+escHtml(date)+'</p><div class="card" style="padding:4px 16px">';
+    const dt=grouped[date].reduce((s,e)=>s+(+e.amount||0),0);
+    html+='<div class="dayh"><span>'+escHtml(dayLabel(date))+'</span><span class="num">'+escHtml(fmt(dt))+'</span></div><div class="card list">';
     grouped[date].forEach(e=>{
       const cat=ST.varItems.find(v=>v.id===e.catId);
-      html+='<div class="li"><div style="min-width:0;flex:1">'+
-        '<p class="li-n">'+escHtml(e.desc)+'</p>'+
-        '<p class="li-d"><span class="dot" style="background:'+safeColor(cat&&cat.color)+';margin-inline-end:6px"></span>'+escHtml((cat?cat.icon+" ":"")+getCatName(cat||{}))+'</p></div>'+
-        '<div class="row-s" style="flex-shrink:0"><span class="li-a down">−'+money(e.amount)+'</span>'+
-        '<button type="button" class="btn btn-del btn-sm" onclick="deleteExpense('+nid(e.id)+')" aria-label="'+escHtml(L.delete)+'">✕</button></div></div>';
+      html+='<div class="li"><span class="cico" style="background:'+tint(cat&&cat.color)+'">'+escHtml(cat?cat.icon:"•")+'</span>'+
+        '<div style="min-width:0;flex:1"><p class="li-n">'+escHtml(e.desc)+'</p><p class="li-d">'+escHtml(getCatName(cat||{}))+'</p></div>'+
+        '<span class="li-a num">−'+escHtml(fmt(e.amount))+'</span>'+
+        '<button type="button" class="xbtn" onclick="deleteExpense('+nid(e.id)+')" aria-label="'+escHtml(L.delete)+'">'+TRASH+'</button></div>';
     });
     html+='</div>';
   });
@@ -999,30 +1083,25 @@ function renderHistory(L){
 function renderAccounting(L){
   const entries=expenses().map(e=>({...e,soll:ACCOUNT_MAP[e.catKey||"custom"]||"6800",haben:"1200"}));
   const rows=entries.length?entries.map(e=>
-    '<tr><td class="n" style="color:var(--ink-faint)">'+escHtml(e.date)+'</td>'+
-    '<td class="t">'+escHtml(e.desc)+'</td>'+
-    '<td class="n down">'+e.soll+'</td><td class="n up">'+e.haben+'</td>'+
-    '<td class="n">'+escHtml(fmt(e.amount))+'</td></tr>').join("")
-    :'<tr><td colspan="5" style="text-align:center;color:var(--ink-faint);padding:22px">'+escHtml(L.noExpenses)+'</td></tr>';
+    '<div class="li"><div style="min-width:0;flex:1"><p class="li-n">'+escHtml(e.desc)+'</p>'+
+      '<p class="acct"><span class="num">'+escHtml(e.date)+'</span>·<span>Soll <b class="num down">'+e.soll+'</b></span>·<span>Haben <b class="num up">'+e.haben+'</b></span></p></div>'+
+      '<span class="li-a num">'+escHtml(fmt(e.amount))+'</span></div>').join("")
+    :'<p class="sub" style="text-align:center;padding:22px 0">'+escHtml(L.noExpenses)+'</p>';
   const tf=totalFixed(),ts=totalSpent();
-  const brow=(l,v,cls)=>'<div class="row-b" style="padding:6px 0;border-bottom:1px solid var(--line)"><span class="sub">'+escHtml(l)+'</span><span class="li-a '+cls+'" style="font-size:13px">'+money(v)+'</span></div>';
+  const brow=(l,v)=>'<div class="row-b" style="padding:8px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px;color:var(--ink-soft)">'+escHtml(l)+'</span><span class="num" style="font-size:13px;white-space:nowrap">'+escHtml(fmt(v))+'</span></div>';
+  const side=(cls,title,a,b,total,color)=>'<div class="icard mini '+cls+'"><p class="ih" style="color:'+color+'">'+escHtml(title)+'</p>'+a+b+
+    '<div class="row-b" style="padding-top:10px"><span style="font-size:13px;font-weight:600">'+escHtml(L.total)+'</span><span class="num" style="font-weight:600;font-size:14px;white-space:nowrap;color:'+color+'">'+escHtml(fmt(total))+'</span></div></div>';
+  const exp=(fn,icon,label,ext,cls)=>'<button type="button" class="icard mini '+cls+'" onclick="'+fn+'()"><p class="ih">'+ico(icon)+escHtml(label)+'</p><p class="sub" style="margin-top:6px">'+escHtml(L.exportSub)+' · '+ext+'</p></button>';
   return pageTitle(L,3)+
-  '<div class="grid2" style="margin-bottom:14px">'+
-    '<button type="button" class="btn btn-col" onclick="exportExcel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4zM4 9h16M4 14h16M10 4v16"/></svg>'+escHtml(L.exportExcel)+'</button>'+
-    '<button type="button" class="btn btn-col" onclick="exportDATEV()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>'+escHtml(L.exportDATEV)+'</button>'+
-  '</div>'+
+  '<div class="ins" style="margin-bottom:14px">'+exp("exportExcel","grid",L.exportExcel,".xlsx","c4")+exp("exportDATEV","down",L.exportDATEV,".csv","c3")+'</div>'+
   '<div class="card tint"><p class="sec" style="margin-bottom:6px">DATEV · SAP</p><p class="note">'+escHtml(L.datevInfo)+'</p></div>'+
-  '<div class="card"><p class="sec">'+escHtml(L.journal)+'</p><div class="tbl-wrap"><table class="tbl"><thead><tr>'+
-    '<th>'+escHtml(L.dateLabel)+'</th><th>'+escHtml(L.descLabel)+'</th><th>'+escHtml(L.debit)+'</th><th>'+escHtml(L.credit)+'</th><th>€</th>'+
-  '</tr></thead><tbody>'+rows+'</tbody></table></div></div>'+
-  '<div class="card"><p class="sec">'+escHtml(L.balance)+'</p><div class="grid2">'+
-    '<div><p class="sec up" style="margin-bottom:6px">'+escHtml(L.assets)+'</p>'+
-      brow(L.salary,ST.income,"up")+brow(L.varBudgets,totalVarBudget(),"up")+
-      '<div class="row-b" style="padding-top:8px"><span style="font-size:13px;font-weight:500">'+escHtml(L.total)+'</span><span class="li-a up">'+money(ST.income+totalVarBudget())+'</span></div></div>'+
-    '<div><p class="sec down" style="margin-bottom:6px">'+escHtml(L.liabilities)+'</p>'+
-      brow(L.fixedExp,tf,"down")+brow(L.spent,ts,"down")+
-      '<div class="row-b" style="padding-top:8px"><span style="font-size:13px;font-weight:500">'+escHtml(L.total)+'</span><span class="li-a down">'+money(tf+ts)+'</span></div></div>'+
-  '</div></div>';
+  '<div class="ins-h"><h2>'+escHtml(L.journal)+'</h2><span class="sub num">'+entries.length+' '+escHtml(L.entries)+'</span></div>'+
+  '<div class="card list" style="margin-bottom:26px">'+rows+'</div>'+
+  '<div class="ins-h"><h2>'+escHtml(L.balance)+'</h2></div>'+
+  '<div class="ins">'+
+    side("c4",L.assets,brow(L.salary,ST.income),brow(L.varBudgets,totalVarBudget()),ST.income+totalVarBudget(),"var(--plus)")+
+    side("c2",L.liabilities,brow(L.fixedExp,tf),brow(L.spent,ts),tf+ts,"var(--minus)")+
+  '</div>';
 }
 
 // ---------- 4 · REPORT ----------
@@ -1035,27 +1114,26 @@ function renderReport(L){
     :!ST.reportText
     ?'<button type="button" class="btn btn-solid btn-full no-print" onclick="generateReport()">'+escHtml(L.generate)+'</button>'
     :'<div class="text-block">'+escHtml(ST.reportText)+'</div>';
-  const sum=[[L.salary,ST.income,"up"],[L.fixedExp,totalFixed(),"warn"],[L.spent,totalSpent(),"down"],[L.remaining,remaining(),remaining()>=0?"up":"down"]]
-    .map(r=>'<div class="tile" style="background:var(--card2)"><p class="tl">'+escHtml(r[0])+'</p><p class="tv '+r[2]+'">'+money(r[1])+'</p></div>').join("");
+  const sum=[[L.salary,ST.income,"c4","cash"],[L.fixedExp,totalFixed(),"c3","cal"],[L.spent,totalSpent(),"c2","pie"],[L.remaining,remaining(),"c1","target"]]
+    .map(r=>'<div class="icard mini '+r[2]+'"><p class="ih">'+ico(r[3])+escHtml(r[0])+'</p><p class="iv num'+(r[1]<0?" down":"")+'">'+escHtml(fmt(r[1]))+'</p></div>').join("");
   const detail=ST.varItems.map(v=>{
     const s=spentCat(v.id),r=(+v.budget||0)-s;
-    return '<tr><td>'+escHtml(v.icon)+' '+escHtml(getCatName(v))+'</td><td class="n" style="color:var(--ink-faint)">'+escHtml(fmt(v.budget))+'</td>'+
-      '<td class="n down">'+escHtml(fmt(s))+'</td><td class="n '+(r>=0?"up":"down")+'">'+escHtml(fmt(r))+'</td>'+
-      '<td style="font-size:12px">'+escHtml(r>=0?L.within:L.exceeded)+'</td></tr>';
+    const b=+v.budget||0,p=b>0?Math.min(s/b*100,100):(s>0?100:0);
+    return '<div class="li"><span class="cico" style="background:'+tint(v.color)+'">'+escHtml(v.icon)+'</span>'+
+      '<div style="flex:1;min-width:0"><div class="row-b"><p class="li-n">'+escHtml(getCatName(v))+'</p><span class="pill2 '+(r>=0?"ok":"bad")+'">'+escHtml(r>=0?L.within:L.exceeded)+'</span></div>'+
+      '<div class="bar" style="margin:7px 0 5px"><i class="'+(r<0?"hot":"")+'" style="'+(r<0?"":"background:"+safeColor(v.color)+";")+'width:'+p.toFixed(0)+'%"></i></div>'+
+      '<div class="row-b sub"><span class="num">'+escHtml(fmt(s))+' / '+escHtml(fmt(b))+'</span><span class="num '+(r>=0?"up":"down")+'">'+escHtml(fmt(r))+'</span></div></div></div>';
   }).join("");
   return pageTitle(L,4,
     '<div class="row-s no-print">'+(AI_ON?'<button type="button" class="btn btn-sm" onclick="generateReport()">'+escHtml(L.refresh)+'</button>':"")+
-    '<button type="button" class="btn btn-solid btn-sm" onclick="window.print()">'+escHtml(L.pdf)+'</button></div>')+
+    '<button type="button" class="btn btn-pri btn-sm" onclick="window.print()">'+escHtml(L.pdf)+'</button></div>')+
+  '<div class="ins-h"><h2>'+escHtml(L.summary)+'</h2></div><div class="ins" style="margin-bottom:22px">'+sum+'</div>'+
+  '<div class="ins-h"><h2>'+escHtml(L.details)+'</h2></div><div class="card list">'+detail+'</div>'+
+  (AI_ON?'<div class="card"><p class="sec">'+escHtml(L.analysis)+'</p>'+analysis+'</div>':"")+
   '<div class="card no-print"><div class="row-b"><div><p style="margin:0;font-size:15px;font-weight:500">'+escHtml(L.gmail)+'</p><p class="sub">'+escHtml(L.gmailDesc)+'</p></div>'+
     '<button type="button" class="btn btn-sm" onclick="sendGmail()"'+(gs==="loading"||!AI_ON?" disabled":"")+'>'+escHtml(gmailLabel)+'</button></div>'+
     (gs==="success"?'<p class="note up" style="margin-top:10px">'+escHtml(L.gmailDone)+'</p>':"")+
     (gs==="error"?'<p class="note down" style="margin-top:10px">'+escHtml(L.gmailFail)+'</p>':"")+aiOff+
-  '</div>'+
-  '<div class="card"><p class="sec">'+escHtml(L.summary)+'</p><div class="grid2" style="margin-bottom:18px">'+sum+'</div>'+
-    '<p class="sec">'+escHtml(L.details)+'</p><div class="tbl-wrap" style="margin-bottom:18px"><table class="tbl"><thead><tr>'+
-      '<th>'+escHtml(L.catLabel)+'</th><th>'+escHtml(L.budget)+'</th><th>'+escHtml(L.spent)+'</th><th>'+escHtml(L.remaining)+'</th><th>'+escHtml(L.status)+'</th>'+
-    '</tr></thead><tbody>'+detail+'</tbody></table></div>'+
-    (AI_ON?'<p class="sec">'+escHtml(L.analysis)+'</p>'+analysis:"")+
   '</div>';
 }
 

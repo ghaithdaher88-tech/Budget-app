@@ -1,6 +1,6 @@
 // BudgetPro service worker: keeps the app usable offline.
 // Bump VERSION whenever app files change so phones pick up the new copy.
-const VERSION = "budgetpro-v3";
+const VERSION = "budgetpro-v4";
 const SHELL = [
   "./",
   "./index.html",
