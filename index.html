@@ -36,6 +36,52 @@ body.ocean   { --paper:#0b141b; --card:#11202a; --card2:#172a36; --line:#1f3441;
 body.rose    { --paper:#181112; --card:#231a1c; --card2:#2b2023; --line:#3a2a2e; --ring:#f0788c; --track:#3a2a2e; }
 body.slate   { --paper:#14161a; --card:#1c1f25; --card2:#242830; --line:#2e323b; --ring:#e8b04a; --track:#2e323b; }
 
+/* ================= PRO MAX THEME (experimental) =================
+   Generated with the ui-ux-pro-max skill ("Personal Finance Tracker" palette:
+   trust blue + profit green on dark). Everything below is scoped to body.pro,
+   so the other themes are untouched. Remove this block plus the "pro" entries
+   in THEME_NAMES / THEME_ACCENT / THEME_BG to drop it completely. */
+body.pro{
+  --ink:#f8fafc; --ink-soft:#94a3b8; --ink-faint:#8391a7;
+  --paper:#0f172a; --card:#192134; --card2:#101a34; --line:rgba(255,255,255,.08);
+  --ring:#3b82f6; --track:#26314a;
+  --plus:#10b981; --minus:#f87171; --warn:#fbbf24;   /* lighter red/amber: ≥4.5:1 on the dark background */
+  --on-ink:#0f172a; --scrim:rgba(2,6,23,.7);
+  --primary:#1e40af; --on-primary:#ffffff;
+  --radius:16px;
+}
+body.pro{scroll-behavior:smooth}
+/* Depth: soft elevation instead of flat borders only */
+body.pro .card, body.pro .tile, body.pro .cat{box-shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(2,6,23,.35)}
+body.pro .card.tint{box-shadow:none}
+/* Primary actions use the brand blue (8.6:1 contrast with white text) */
+body.pro .btn-solid{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+body.pro .btn-ok{color:#0f172a}
+/* Interaction feedback: 150–200ms transitions on every interactive element */
+body.pro .btn, body.pro .chip-btn, body.pro .opt, body.pro .pick-i, body.pro .pick-c,
+body.pro .month-btn, body.pro .month-item, body.pro .nav-btn, body.pro .pill{transition:background-color .18s,border-color .18s,color .18s,transform .15s}
+body.pro .pill:active, body.pro .opt:active, body.pro .chip-btn:active{transform:scale(.97)}
+/* Touch targets: minimum 44×44px with ≥8px spacing */
+body.pro .btn-sm, body.pro .chip-btn, body.pro .month-btn{min-height:44px}
+body.pro .pick-i{min-width:44px;min-height:44px}
+body.pro .pick-c{width:44px;height:44px}
+body.pro .picker{gap:8px}
+body.pro .month-item{min-height:44px}
+/* Legibility: no text below 12px */
+body.pro .nav-btn{font-size:12px}
+body.pro .pill-l, body.pro .tbl th{font-size:12px}
+/* Bottom nav: clear active indicator, not colour alone */
+body.pro #bottom-nav{background:rgba(15,23,42,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+body.pro .nav-btn{position:relative;min-height:56px}
+body.pro .nav-btn.active::before{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 3px 3px;background:var(--ring)}
+body.pro .nav-btn.active span{font-weight:600}
+/* Header blends with the page */
+body.pro #app-header{background:rgba(15,23,42,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+/* Toast: readable text on the light toast surface */
+body.pro #toast-el{color:var(--on-ink)}
+/* Inputs: visible focus ring, not just a border tint */
+body.pro .inp:focus{box-shadow:0 0 0 3px rgba(59,130,246,.35)}
+
 /* ================= BASE ================= */
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%}
@@ -369,9 +415,9 @@ const T = {
   }
 };
 
-const THEME_NAMES={light:{ar:"فاتح",en:"Light",de:"Hell"},dark:{ar:"داكن",en:"Dark",de:"Dunkel"},midnight:{ar:"منتصف الليل",en:"Midnight",de:"Mitternacht"},forest:{ar:"غابة",en:"Forest",de:"Wald"},ocean:{ar:"محيط",en:"Ocean",de:"Ozean"},rose:{ar:"وردي",en:"Rose",de:"Rosa"},slate:{ar:"رمادي",en:"Slate",de:"Schiefer"}};
-const THEME_ACCENT={light:"#2f6f5e",dark:"#5fc4a5",midnight:"#8da2fb",forest:"#6fcf97",ocean:"#4cb8ea",rose:"#f0788c",slate:"#e8b04a"};
-const THEME_BG={light:"#f5f3ee",dark:"#121715",midnight:"#0b0e15",forest:"#0d1511",ocean:"#0b141b",rose:"#181112",slate:"#14161a"};
+const THEME_NAMES={light:{ar:"فاتح",en:"Light",de:"Hell"},dark:{ar:"داكن",en:"Dark",de:"Dunkel"},midnight:{ar:"منتصف الليل",en:"Midnight",de:"Mitternacht"},forest:{ar:"غابة",en:"Forest",de:"Wald"},ocean:{ar:"محيط",en:"Ocean",de:"Ozean"},rose:{ar:"وردي",en:"Rose",de:"Rosa"},slate:{ar:"رمادي",en:"Slate",de:"Schiefer"},pro:{ar:"برو ماكس",en:"Pro Max",de:"Pro Max"}};
+const THEME_ACCENT={light:"#2f6f5e",dark:"#5fc4a5",midnight:"#8da2fb",forest:"#6fcf97",ocean:"#4cb8ea",rose:"#f0788c",slate:"#e8b04a",pro:"#3b82f6"};
+const THEME_BG={light:"#f5f3ee",dark:"#121715",midnight:"#0b0e15",forest:"#0d1511",ocean:"#0b141b",rose:"#181112",slate:"#14161a",pro:"#0f172a"};
 
 // Default variable categories with keys for translation
 const DEFAULT_VAR = [
